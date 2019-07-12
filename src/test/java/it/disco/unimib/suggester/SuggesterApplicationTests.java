@@ -3,9 +3,9 @@ package it.disco.unimib.suggester;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sun.tools.javac.util.List;
-import it.disco.unimib.suggester.microsoftTranslate.Detect;
-import it.disco.unimib.suggester.microsoftTranslate.messages.DetectMessage;
-import it.disco.unimib.suggester.microsoftTranslate.TextToTranslate;
+import it.disco.unimib.suggester.microsoftTranslate.MSTranslator;
+import it.disco.unimib.suggester.microsoftTranslate.domain.DetectMessage;
+import it.disco.unimib.suggester.microsoftTranslate.domain.TranslateMessage;
 import lombok.extern.java.Log;
 import org.junit.Assert;
 import org.junit.Test;
@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
+import static it.disco.unimib.suggester.microsoftTranslate.MSTranslator.prettify;
+
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -25,25 +27,41 @@ import java.util.ArrayList;
 public class SuggesterApplicationTests {
 
     @Autowired
-    public Detect detect;
-
+    public MSTranslator translator;
 
     @Test
-    public void textToTranslate() throws IOException {
-        TextToTranslate text = new TextToTranslate("Salve Mondo!");
+    public void detect() throws IOException {
+
+        String text = "Salve Mondo!";
         //log.info(text.getText());
         Gson gson = new Gson();
         String json = gson.toJson(List.of(text));
         //log.info(json);
-        Assert.assertEquals(json, "[{\"text\":\"Salve Mondo!\"}]");
-        String language = detect.Post(List.of(text));
-
+        String language = translator.Detect(List.of(text));
         Type listType = new TypeToken<ArrayList<DetectMessage>>() {
         }.getType();
         java.util.List<DetectMessage> messageList = gson.fromJson(language, listType);
         Assert.assertEquals("it", messageList.get(0).getLanguage());
         Assert.assertEquals(0, messageList.get(0).getScore().compareTo(1.0));
-
     }
+
+    @Test
+    public void translate() throws IOException {
+
+        String text = "Welcome to Microsoft Translator. Guess how many languages I speak!!";
+        //log.info(text.getText());
+        Gson gson = new Gson();
+        String json = gson.toJson(List.of(text));
+        //log.info(json);
+        String translations = translator.Translate(List.of(text));
+        System.out.println(prettify(translations));
+        Type listType = new TypeToken<ArrayList<TranslateMessage>>() {
+        }.getType();
+        java.util.List<TranslateMessage> messageList = gson.fromJson(translations, listType);
+        Assert.assertEquals("en", messageList.get(0).getDetectedLanguage().getLanguage());
+        Assert.assertEquals("de", messageList.get(0).getTranslations().get(0).getTo());
+    }
+
+
 
 }
