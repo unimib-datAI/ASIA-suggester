@@ -38,14 +38,20 @@ public class MSTranslator implements ITranslator {
     }
 
     @Override
-    public String Detect(List<String> textList) throws IOException {
+    public String detect(List<String> textList) throws IOException {
         String url = "https://api.cognitive.microsofttranslator.com/detect?api-version=3.0";
         return post(toTranslateList(textList), url);
     }
 
     @Override
-    public String Translate(List<String> textList) throws IOException {
+    public String translate(List<String> textList) throws IOException {
         String url = "https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=de,it";
+        return post(toTranslateList(textList), url);
+    }
+
+    @Override
+    public String lookup(List<String> textList) throws IOException {
+        String url = "https://api.cognitive.microsofttranslator.com/dictionary/lookup?api-version=3.0&from=en&to=es";
         return post(toTranslateList(textList), url);
     }
 
