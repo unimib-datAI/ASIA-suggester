@@ -1,16 +1,21 @@
-package it.disco.unimib.suggester.microsoftTranslate;
+package it.disco.unimib.suggester.translator.microsoftTranslate;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import it.disco.unimib.suggester.ITranslator;
+import com.google.gson.reflect.TypeToken;
+import it.disco.unimib.suggester.translator.domain.IDetectedLanguage;
+import it.disco.unimib.suggester.translator.ITranslator;
+import it.disco.unimib.suggester.translator.microsoftTranslate.domain.DetectMessage;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,9 +43,13 @@ public class MSTranslator implements ITranslator {
     }
 
     @Override
-    public String detect(List<String> textList) throws IOException {
+    public List<IDetectedLanguage> detect(List<String> textList) throws IOException {
         String url = "https://api.cognitive.microsofttranslator.com/detect?api-version=3.0";
-        return post(toTranslateList(textList), url);
+        String language = post(toTranslateList(textList), url);
+        Type listType = new TypeToken<ArrayList<DetectMessage>>() {
+        }.getType();
+        Gson gson = new Gson();
+        return gson.fromJson(language, listType);
     }
 
     @Override

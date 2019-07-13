@@ -1,10 +1,12 @@
-package it.disco.unimib.suggester;
+package it.disco.unimib.suggester.translator;
+
+import it.disco.unimib.suggester.translator.domain.IDetectedLanguage;
 
 import java.io.IOException;
 import java.util.List;
 
 public interface ITranslator {
-    String detect(List<String> textList) throws IOException;
+    List<IDetectedLanguage> detect(List<String> textList) throws IOException;
 
     String translate(List<String> textList) throws IOException;
 

@@ -3,10 +3,10 @@ package it.disco.unimib.suggester;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sun.tools.javac.util.List;
-import it.disco.unimib.suggester.microsoftTranslate.domain.LookupMessage;
-import it.disco.unimib.suggester.microsoftTranslate.MSTranslator;
-import it.disco.unimib.suggester.microsoftTranslate.domain.DetectMessage;
-import it.disco.unimib.suggester.microsoftTranslate.domain.TranslateMessage;
+import it.disco.unimib.suggester.translator.microsoftTranslate.domain.LookupMessage;
+import it.disco.unimib.suggester.translator.microsoftTranslate.MSTranslator;
+import it.disco.unimib.suggester.translator.microsoftTranslate.domain.TranslateMessage;
+import it.disco.unimib.suggester.translator.domain.IDetectedLanguage;
 import lombok.extern.java.Log;
 import org.junit.Assert;
 import org.junit.Test;
@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
-import static it.disco.unimib.suggester.microsoftTranslate.MSTranslator.prettify;
+import static it.disco.unimib.suggester.translator.microsoftTranslate.MSTranslator.prettify;
 
 
 @RunWith(SpringRunner.class)
@@ -38,10 +38,7 @@ public class SuggesterApplicationTests {
         Gson gson = new Gson();
         String json = gson.toJson(List.of(text));
         //log.info(json);
-        String language = translator.detect(List.of(text));
-        Type listType = new TypeToken<ArrayList<DetectMessage>>() {
-        }.getType();
-        java.util.List<DetectMessage> messageList = gson.fromJson(language, listType);
+        java.util.List<IDetectedLanguage> messageList = translator.detect(List.of(text));
         Assert.assertEquals("it", messageList.get(0).getLanguage());
         Assert.assertEquals(0, messageList.get(0).getScore().compareTo(1.0));
     }

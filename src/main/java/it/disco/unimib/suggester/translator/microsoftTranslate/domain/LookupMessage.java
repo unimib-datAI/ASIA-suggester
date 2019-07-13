@@ -1,4 +1,4 @@
-package it.disco.unimib.suggester.microsoftTranslate.domain;
+package it.disco.unimib.suggester.translator.microsoftTranslate.domain;
 
 
 import lombok.AllArgsConstructor;

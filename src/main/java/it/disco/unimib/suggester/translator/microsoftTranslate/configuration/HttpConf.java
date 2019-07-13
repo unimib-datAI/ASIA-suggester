@@ -1,4 +1,4 @@
-package it.disco.unimib.suggester.microsoftTranslate.configuration;
+package it.disco.unimib.suggester.translator.microsoftTranslate.configuration;
 
 
 import okhttp3.OkHttpClient;
