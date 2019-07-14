@@ -1,17 +1,18 @@
-package it.disco.unimib.suggester.translator.microsoftTranslate;
+package it.disco.unimib.suggester.translator.implementation.microsoftTranslate;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
-import it.disco.unimib.suggester.translator.domain.IDetectedLanguage;
+import it.disco.unimib.suggester.model.Language;
 import it.disco.unimib.suggester.translator.ITranslator;
+import it.disco.unimib.suggester.translator.domain.IDetectedLanguage;
 import it.disco.unimib.suggester.translator.domain.ILookedupTerm;
 import it.disco.unimib.suggester.translator.domain.ITranslation;
-import it.disco.unimib.suggester.translator.microsoftTranslate.domain.DetectMessage;
-import it.disco.unimib.suggester.translator.microsoftTranslate.domain.LookupMessage;
-import it.disco.unimib.suggester.translator.microsoftTranslate.domain.TranslateMessage;
+import it.disco.unimib.suggester.translator.implementation.microsoftTranslate.domain.DetectMessage;
+import it.disco.unimib.suggester.translator.implementation.microsoftTranslate.domain.LookupMessage;
+import it.disco.unimib.suggester.translator.implementation.microsoftTranslate.domain.TranslateMessage;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,7 +58,8 @@ public class MSTranslator implements ITranslator {
     }
 
     @Override
-    public List<ITranslation> translate(List<String> textList) throws IOException {
+    public List<ITranslation> translate(List<String> textList, Language destLang) throws IOException {
+        System.out.println(destLang.toString());
         String url = "https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=de,it";
         return new Gson().fromJson(
                 post(toTranslateList(textList), url),
@@ -67,7 +69,7 @@ public class MSTranslator implements ITranslator {
     }
 
     @Override
-    public List<ILookedupTerm> lookup(List<String> textList) throws IOException {
+    public List<ILookedupTerm> lookup(List<String> textList, Language destLang) throws IOException {
         String url = "https://api.cognitive.microsofttranslator.com/dictionary/lookup?api-version=3.0&from=en&to=es";
         return new Gson().fromJson(
                 post(toTranslateList(textList), url),

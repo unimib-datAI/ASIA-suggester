@@ -1,4 +1,4 @@
-package it.disco.unimib.suggester.translator.microsoftTranslate.domain;
+package it.disco.unimib.suggester.translator.implementation.microsoftTranslate.domain;
 
 
 import it.disco.unimib.suggester.translator.domain.ITranslation;
