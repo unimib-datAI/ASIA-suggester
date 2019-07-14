@@ -7,7 +7,11 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import it.disco.unimib.suggester.translator.domain.IDetectedLanguage;
 import it.disco.unimib.suggester.translator.ITranslator;
+import it.disco.unimib.suggester.translator.domain.ILookedupTerm;
+import it.disco.unimib.suggester.translator.domain.ITranslation;
 import it.disco.unimib.suggester.translator.microsoftTranslate.domain.DetectMessage;
+import it.disco.unimib.suggester.translator.microsoftTranslate.domain.LookupMessage;
+import it.disco.unimib.suggester.translator.microsoftTranslate.domain.TranslateMessage;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,15 +57,23 @@ public class MSTranslator implements ITranslator {
     }
 
     @Override
-    public String translate(List<String> textList) throws IOException {
+    public List<ITranslation> translate(List<String> textList) throws IOException {
         String url = "https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=de,it";
-        return post(toTranslateList(textList), url);
+        return new Gson().fromJson(
+                post(toTranslateList(textList), url),
+                new TypeToken<ArrayList<TranslateMessage>>() {
+                }.getType());
+
     }
 
     @Override
-    public String lookup(List<String> textList) throws IOException {
+    public List<ILookedupTerm> lookup(List<String> textList) throws IOException {
         String url = "https://api.cognitive.microsofttranslator.com/dictionary/lookup?api-version=3.0&from=en&to=es";
-        return post(toTranslateList(textList), url);
+        return new Gson().fromJson(
+                post(toTranslateList(textList), url),
+                new TypeToken<ArrayList<LookupMessage>>() {
+                }.getType());
+
     }
 
     // This function performs a POST request.

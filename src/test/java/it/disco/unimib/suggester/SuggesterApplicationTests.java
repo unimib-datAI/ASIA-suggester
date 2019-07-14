@@ -3,6 +3,8 @@ package it.disco.unimib.suggester;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sun.tools.javac.util.List;
+import it.disco.unimib.suggester.translator.domain.ILookedupTerm;
+import it.disco.unimib.suggester.translator.domain.ITranslation;
 import it.disco.unimib.suggester.translator.microsoftTranslate.domain.LookupMessage;
 import it.disco.unimib.suggester.translator.microsoftTranslate.MSTranslator;
 import it.disco.unimib.suggester.translator.microsoftTranslate.domain.TranslateMessage;
@@ -47,17 +49,9 @@ public class SuggesterApplicationTests {
     public void translate() throws IOException {
 
         String text = "Welcome to Microsoft Translator. Guess how many languages I speak!!";
-        //log.info(text.getText());
-        Gson gson = new Gson();
-        String json = gson.toJson(List.of(text));
-        //log.info(json);
-        String translations = translator.translate(List.of(text));
-        System.out.println(prettify(translations));
-        Type listType = new TypeToken<ArrayList<TranslateMessage>>() {
-        }.getType();
-        java.util.List<TranslateMessage> messageList = gson.fromJson(translations, listType);
-        Assert.assertEquals("en", messageList.get(0).getDetectedLanguage().getLanguage());
-        Assert.assertEquals("de", messageList.get(0).getTranslations().get(0).getTo());
+        java.util.List<ITranslation> messageList = translator.translate(List.of(text));
+        Assert.assertEquals("en", messageList.get(0).getLanguage());
+        Assert.assertEquals("de", messageList.get(0).getTranslations().get(0).getDestLanguage());
         System.out.println(messageList.get(0).toString());
     }
 
@@ -65,16 +59,9 @@ public class SuggesterApplicationTests {
     @Test
     public void lookup() throws IOException {
         String text = "Pineapples";
-        //log.info(text.getText());
-        Gson gson = new Gson();
-        String json = gson.toJson(List.of(text));
-        //log.info(json);
-        String lookups = translator.lookup(List.of(text));
-        System.out.println(prettify(lookups));
-        Type listType = new TypeToken<ArrayList<LookupMessage>>() {
-        }.getType();
-        java.util.List<LookupMessage> messageList = gson.fromJson(lookups, listType);
-        System.out.println(messageList.get(0).toString());
+        java.util.List<ILookedupTerm> lookups = translator.lookup(List.of(text));
+        Assert.assertEquals(lookups.get(0).getSource().toLowerCase(), "pineapples");
+
     }
 
 
