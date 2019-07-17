@@ -1,5 +1,6 @@
 package it.disco.unimib.suggester.translator.implementation.microsoftTranslate.domain;
 
+import it.disco.unimib.suggester.model.LanguageType;
 import it.disco.unimib.suggester.translator.domain.IDetectedLanguage;
 import it.disco.unimib.suggester.translator.domain.IDetectedLanguageBase;
 import lombok.AllArgsConstructor;
@@ -23,6 +24,11 @@ public class DetectMessage implements IDetectedLanguage {
         return alternatives;
     }
 
+    @Override
+    public LanguageType getLanguageEnum() throws Exception {
+        return LanguageType.fromName(language);
+    }
+
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -32,6 +38,10 @@ public class DetectMessage implements IDetectedLanguage {
         private Boolean isTranslationSupported;
         private Boolean isTransliterationSupported;
 
+        @Override
+        public LanguageType getLanguageEnum() throws Exception {
+            return LanguageType.fromName(language);
+        }
     }
 
 }

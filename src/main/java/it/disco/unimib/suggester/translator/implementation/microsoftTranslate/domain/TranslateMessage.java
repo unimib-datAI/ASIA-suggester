@@ -1,6 +1,7 @@
 package it.disco.unimib.suggester.translator.implementation.microsoftTranslate.domain;
 
 
+import it.disco.unimib.suggester.model.LanguageType;
 import it.disco.unimib.suggester.translator.domain.ITranslation;
 import it.disco.unimib.suggester.translator.domain.ITranslationBase;
 import lombok.AllArgsConstructor;
@@ -19,6 +20,11 @@ public class TranslateMessage implements ITranslation {
     @Override
     public String getLanguage() {
         return detectedLanguage.getLanguage();
+    }
+
+    @Override
+    public LanguageType getLanguageEnum() {
+        return null;
     }
 
     @Override

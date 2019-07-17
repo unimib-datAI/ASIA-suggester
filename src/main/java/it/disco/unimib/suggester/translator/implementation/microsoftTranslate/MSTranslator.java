@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
-import it.disco.unimib.suggester.model.Language;
+import it.disco.unimib.suggester.model.LanguageType;
 import it.disco.unimib.suggester.translator.ITranslator;
 import it.disco.unimib.suggester.translator.domain.IDetectedLanguage;
 import it.disco.unimib.suggester.translator.domain.ILookedupTerm;
@@ -58,7 +58,7 @@ public class MSTranslator implements ITranslator {
     }
 
     @Override
-    public List<ITranslation> translate(List<String> textList, Language destLang) throws IOException {
+    public List<ITranslation> translate(List<String> textList, LanguageType destLang) throws IOException {
         System.out.println(destLang.toString());
         String url = "https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=de,it";
         return new Gson().fromJson(
@@ -69,8 +69,9 @@ public class MSTranslator implements ITranslator {
     }
 
     @Override
-    public List<ILookedupTerm> lookup(List<String> textList, Language destLang) throws IOException {
-        String url = "https://api.cognitive.microsofttranslator.com/dictionary/lookup?api-version=3.0&from=en&to=es";
+    public List<ILookedupTerm> lookup(List<String> textList, LanguageType sourceLang, LanguageType destLang) throws IOException {
+        String fromTo = String.format("from=%s&to=%s", sourceLang.toString(), destLang.toString());
+        String url = "https://api.cognitive.microsofttranslator.com/dictionary/lookup?api-version=3.0&" + fromTo;
         return new Gson().fromJson(
                 post(toTranslateList(textList), url),
                 new TypeToken<ArrayList<LookupMessage>>() {

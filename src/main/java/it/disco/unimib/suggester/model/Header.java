@@ -13,5 +13,5 @@ import java.util.List;
 public class Header {
     private String originalWord;
     private List<String> splitTerms;
-    private Language language;
+    private LanguageType language;
 }
