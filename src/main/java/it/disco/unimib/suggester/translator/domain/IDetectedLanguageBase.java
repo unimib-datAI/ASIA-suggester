@@ -5,7 +5,7 @@ import it.disco.unimib.suggester.model.LanguageType;
 public interface IDetectedLanguageBase {
     String getLanguage();
 
-    LanguageType getLanguageEnum() throws Exception;
+    LanguageType getLanguageEnum();
 
     Double getScore();
 }

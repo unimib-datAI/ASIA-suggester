@@ -25,7 +25,7 @@ public class DetectMessage implements IDetectedLanguage {
     }
 
     @Override
-    public LanguageType getLanguageEnum() throws Exception {
+    public LanguageType getLanguageEnum() {
         return LanguageType.fromName(language);
     }
 
@@ -39,7 +39,7 @@ public class DetectMessage implements IDetectedLanguage {
         private Boolean isTransliterationSupported;
 
         @Override
-        public LanguageType getLanguageEnum() throws Exception {
+        public LanguageType getLanguageEnum() {
             return LanguageType.fromName(language);
         }
     }

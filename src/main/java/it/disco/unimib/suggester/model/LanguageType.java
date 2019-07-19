@@ -6,7 +6,9 @@ public enum LanguageType {
     IT("it"),
     DE("de"),
     ES("es"),
-    si("si");
+    SI("si"),
+    UNKNOWN("unknown");
+
 
     private String language;
 
@@ -14,16 +16,16 @@ public enum LanguageType {
         this.language = lang;
     }
 
-    public static LanguageType fromName(String x) throws Exception {
+    public static LanguageType fromName(String x) {
         for (LanguageType currentType : LanguageType.values()) {
             if (x.equals(currentType.getLanguage())) {
                 return currentType;
             }
         }
-        throw new Exception("Unmatched Type: " + x);
+        return LanguageType.UNKNOWN;
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         LanguageType lang = fromName("en");
         System.out.println(lang);
 

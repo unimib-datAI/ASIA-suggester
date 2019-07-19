@@ -7,11 +7,12 @@ import it.disco.unimib.suggester.translator.domain.ITranslation;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 public interface ITranslator {
-    List<IDetectedLanguage> detect(List<String> textList) throws IOException;
+    List<IDetectedLanguage> detect(List<String> textList);
 
     List<ITranslation> translate(List<String> textList, LanguageType destLang) throws IOException;
 
-    List<ILookedupTerm> lookup(List<String> textList, LanguageType sourceLang, LanguageType destLang) throws IOException;
+    Optional<List<ILookedupTerm>> lookup(List<String> textList, LanguageType sourceLang, LanguageType destLang);
 }

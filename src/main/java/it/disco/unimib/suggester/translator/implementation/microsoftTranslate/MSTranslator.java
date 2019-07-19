@@ -14,7 +14,6 @@ import it.disco.unimib.suggester.translator.implementation.microsoftTranslate.do
 import it.disco.unimib.suggester.translator.implementation.microsoftTranslate.domain.LookupMessage;
 import it.disco.unimib.suggester.translator.implementation.microsoftTranslate.domain.TranslateMessage;
 import okhttp3.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +21,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -31,8 +31,11 @@ public class MSTranslator implements ITranslator {
     String subscriptionKey;
 
 
-    @Autowired
-    private OkHttpClient client;
+    private final OkHttpClient client;
+
+    public MSTranslator(OkHttpClient client) {
+        this.client = client;
+    }
 
     // This function prettifies the json response.
     public static String prettify(String json_text) {
@@ -48,9 +51,14 @@ public class MSTranslator implements ITranslator {
     }
 
     @Override
-    public List<IDetectedLanguage> detect(List<String> textList) throws IOException {
+    public List<IDetectedLanguage> detect(List<String> textList) {
         String url = "https://api.cognitive.microsofttranslator.com/detect?api-version=3.0";
-        String language = post(toTranslateList(textList), url);
+        String language = null;
+        try {
+            language = post(toTranslateList(textList), url);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         Type listType = new TypeToken<ArrayList<DetectMessage>>() {
         }.getType();
         Gson gson = new Gson();
@@ -69,18 +77,24 @@ public class MSTranslator implements ITranslator {
     }
 
     @Override
-    public List<ILookedupTerm> lookup(List<String> textList, LanguageType sourceLang, LanguageType destLang) throws IOException {
+    public Optional<List<ILookedupTerm>> lookup(List<String> textList, LanguageType sourceLang, LanguageType destLang) {
         String fromTo = String.format("from=%s&to=%s", sourceLang.toString(), destLang.toString());
         String url = "https://api.cognitive.microsofttranslator.com/dictionary/lookup?api-version=3.0&" + fromTo;
-        return new Gson().fromJson(
-                post(toTranslateList(textList), url),
-                new TypeToken<ArrayList<LookupMessage>>() {
-                }.getType());
 
+        try {
+            return Optional.of(new Gson().fromJson(
+                    post(toTranslateList(textList), url),
+                    new TypeToken<ArrayList<LookupMessage>>() {
+                    }.getType()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return Optional.empty();
     }
 
     // This function performs a POST request.
-    public String post(List<TextToTranslate> listTextToTranslate, String urlTo) throws IOException {
+    private String post(List<TextToTranslate> listTextToTranslate, String urlTo) throws IOException {
         MediaType mediaType = MediaType.parse("application/json");
 
         Gson gson = new Gson();
@@ -93,6 +107,7 @@ public class MSTranslator implements ITranslator {
                 .addHeader("Ocp-Apim-Subscription-Key", subscriptionKey)
                 .addHeader("Content-type", "application/json").build();
         Response response = client.newCall(request).execute();
+        assert response.body() != null;
         return response.body().string();
     }
 

@@ -16,6 +16,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Optional;
 
 
 @RunWith(SpringRunner.class)
@@ -27,7 +29,7 @@ public class SuggesterApplicationTests {
     public MSTranslator translator;
 
     @Test
-    public void detect() throws IOException {
+    public void detect() {
 
         String text = "Salve Mondo!";
         //log.info(text.getText());
@@ -51,11 +53,11 @@ public class SuggesterApplicationTests {
 
 
     @Test
-    public void lookup() throws IOException {
+    public void lookup() {
         String text = "Casa";
-        java.util.List<ILookedupTerm> lookups = translator.lookup(List.of(text), LanguageType.IT, LanguageType.EN);
-        System.out.println(lookups.toString());
-        Assert.assertEquals(lookups.get(0).getSource().toLowerCase(), "pineapples");
+        Optional<java.util.List<ILookedupTerm>> lookups = translator.lookup(List.of(text), LanguageType.IT, LanguageType.EN);
+        System.out.println(lookups.orElse(Collections.emptyList()).toString());
+        Assert.assertEquals(lookups.orElse(Collections.emptyList()).get(0).getSource().toLowerCase(), "pineapples");
 
     }
 
