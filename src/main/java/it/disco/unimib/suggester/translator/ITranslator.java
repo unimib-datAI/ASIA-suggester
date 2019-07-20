@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ITranslator {
+
     List<IDetectedLanguage> detect(List<String> textList);
 
     List<ITranslation> translate(List<String> textList, LanguageType destLang) throws IOException;

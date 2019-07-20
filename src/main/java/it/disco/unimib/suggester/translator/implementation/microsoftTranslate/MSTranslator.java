@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
+import it.disco.unimib.suggester.ConfigProperties;
 import it.disco.unimib.suggester.model.LanguageType;
 import it.disco.unimib.suggester.translator.ITranslator;
 import it.disco.unimib.suggester.translator.domain.IDetectedLanguage;
@@ -14,7 +15,6 @@ import it.disco.unimib.suggester.translator.implementation.microsoftTranslate.do
 import it.disco.unimib.suggester.translator.implementation.microsoftTranslate.domain.LookupMessage;
 import it.disco.unimib.suggester.translator.implementation.microsoftTranslate.domain.TranslateMessage;
 import okhttp3.*;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -27,14 +27,14 @@ import java.util.stream.Collectors;
 @Component
 public class MSTranslator implements ITranslator {
 
-    @Value("${key}")
-    String subscriptionKey;
-
+    private ConfigProperties properties;
 
     private final OkHttpClient client;
 
-    public MSTranslator(OkHttpClient client) {
+    public MSTranslator(OkHttpClient client, ConfigProperties properties) {
+
         this.client = client;
+        this.properties = properties;
     }
 
     // This function prettifies the json response.
@@ -52,7 +52,7 @@ public class MSTranslator implements ITranslator {
 
     @Override
     public List<IDetectedLanguage> detect(List<String> textList) {
-        String url = "https://api.cognitive.microsofttranslator.com/detect?api-version=3.0";
+        String url = properties.getMainEndpoint() + "/" + properties.getDetectEndpoint();
         String language = null;
         try {
             language = post(toTranslateList(textList), url);
@@ -68,7 +68,7 @@ public class MSTranslator implements ITranslator {
     @Override
     public List<ITranslation> translate(List<String> textList, LanguageType destLang) throws IOException {
         System.out.println(destLang.toString());
-        String url = "https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=de,it";
+        String url = properties.getMainEndpoint() + "/" + properties.getTranslateEndpoint() + "&to=de,it";
         return new Gson().fromJson(
                 post(toTranslateList(textList), url),
                 new TypeToken<ArrayList<TranslateMessage>>() {
@@ -79,7 +79,7 @@ public class MSTranslator implements ITranslator {
     @Override
     public Optional<List<ILookedupTerm>> lookup(List<String> textList, LanguageType sourceLang, LanguageType destLang) {
         String fromTo = String.format("from=%s&to=%s", sourceLang.toString(), destLang.toString());
-        String url = "https://api.cognitive.microsofttranslator.com/dictionary/lookup?api-version=3.0&" + fromTo;
+        String url = properties.getMainEndpoint() + "/" + properties.getLookupEndpoint() + "&" + fromTo;
 
         try {
             return Optional.of(new Gson().fromJson(
@@ -104,7 +104,7 @@ public class MSTranslator implements ITranslator {
 
         Request request = new Request.Builder()
                 .url(urlTo).post(body)
-                .addHeader("Ocp-Apim-Subscription-Key", subscriptionKey)
+                .addHeader("Ocp-Apim-Subscription-Key", properties.getSubscriptionKey())
                 .addHeader("Content-type", "application/json").build();
         Response response = client.newCall(request).execute();
         assert response.body() != null;
