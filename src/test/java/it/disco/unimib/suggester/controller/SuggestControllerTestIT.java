@@ -23,7 +23,7 @@ import static org.hamcrest.Matchers.equalTo;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 //@AutoConfigureMockMvc
 @Log
-public class SuggestControllerTest {
+public class SuggestControllerTestIT {
 
     @LocalServerPort
     private int port;

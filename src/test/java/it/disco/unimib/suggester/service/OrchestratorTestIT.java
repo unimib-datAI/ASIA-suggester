@@ -14,7 +14,7 @@ import java.util.List;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @Log
-public class OrchestratorTest {
+public class OrchestratorTestIT {
 
     @Autowired
     private Orchestrator orchestrator;

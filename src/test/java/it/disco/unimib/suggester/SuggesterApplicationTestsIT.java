@@ -22,7 +22,7 @@ import java.util.Optional;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @Log
-public class SuggesterApplicationTests {
+public class SuggesterApplicationTestsIT {
 
     @Autowired
     public MSTranslator translator;
