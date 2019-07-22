@@ -104,4 +104,20 @@ public class ABSTATService {
     public String listSummaries() {
         return "";
     }
+
+    public String getAbstatBasePath() {
+        return abstatBasePath;
+    }
+
+    public void setAbstatBasePath(String abstatBasePath) {
+        this.abstatBasePath = abstatBasePath;
+    }
+
+    public String[] getPreferredSummaries() {
+        return preferredSummaries;
+    }
+
+    public void setPreferredSummaries(String[] preferredSummaries) {
+        this.preferredSummaries = preferredSummaries;
+    }
 }
