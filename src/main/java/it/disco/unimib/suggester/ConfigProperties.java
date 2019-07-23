@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import javax.validation.constraints.NotNull;
-
 @Configuration
 @ConfigurationProperties(prefix = "suggester")
 @Data
@@ -16,15 +14,11 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class ConfigProperties {
 
-    private String subscriptionKey;
-    @NotNull
-    private String mainEndpoint;
-    @NotNull
-    private String detectEndpoint;
-    @NotNull
-    private String translateEndpoint;
-    @NotNull
-    private String lookupEndpoint;
+    private Translator translator;
+    private Summarizer summarizer;
+
+
 
 
 }
+

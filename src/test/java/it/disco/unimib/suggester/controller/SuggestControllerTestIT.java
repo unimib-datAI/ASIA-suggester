@@ -19,7 +19,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 
 @RunWith(SpringRunner.class)
-//@WebMvcTest(SuggestController.class)
+//@WebMvcTest(SuggestControllerTest.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 //@AutoConfigureMockMvc
 @Log

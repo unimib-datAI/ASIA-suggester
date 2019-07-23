@@ -1,9 +1,6 @@
 package it.disco.unimib.suggester.translator.implementation.microsoftTranslate;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import it.disco.unimib.suggester.ConfigProperties;
 import it.disco.unimib.suggester.model.LanguageType;
@@ -37,13 +34,7 @@ public class MSTranslator implements ITranslator {
         this.properties = properties;
     }
 
-    // This function prettifies the json response.
-    public static String prettify(String json_text) {
-        JsonParser parser = new JsonParser();
-        JsonElement json = parser.parse(json_text);
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        return gson.toJson(json);
-    }
+
 
     private static List<TextToTranslate> toTranslateList(List<String> textList) {
         return textList.stream().map(TextToTranslate::new).collect(Collectors.toList());
@@ -52,7 +43,7 @@ public class MSTranslator implements ITranslator {
 
     @Override
     public List<IDetectedLanguage> detect(List<String> textList) {
-        String url = properties.getMainEndpoint() + "/" + properties.getDetectEndpoint();
+        String url = properties.getTranslator().getMainEndpoint() + "/" + properties.getTranslator().getDetectEndpoint();
         String language = null;
         try {
             language = post(toTranslateList(textList), url);
@@ -68,7 +59,7 @@ public class MSTranslator implements ITranslator {
     @Override
     public List<ITranslation> translate(List<String> textList, LanguageType destLang) throws IOException {
         System.out.println(destLang.toString());
-        String url = properties.getMainEndpoint() + "/" + properties.getTranslateEndpoint() + "&to=de,it";
+        String url = properties.getTranslator().getMainEndpoint() + "/" + properties.getTranslator().getTranslateEndpoint() + "&to=de,it";
         return new Gson().fromJson(
                 post(toTranslateList(textList), url),
                 new TypeToken<ArrayList<TranslateMessage>>() {
@@ -79,7 +70,7 @@ public class MSTranslator implements ITranslator {
     @Override
     public Optional<List<ILookedupTerm>> lookup(List<String> textList, LanguageType sourceLang, LanguageType destLang) {
         String fromTo = String.format("from=%s&to=%s", sourceLang.toString(), destLang.toString());
-        String url = properties.getMainEndpoint() + "/" + properties.getLookupEndpoint() + "&" + fromTo;
+        String url = properties.getTranslator().getMainEndpoint() + "/" + properties.getTranslator().getLookupEndpoint() + "&" + fromTo;
 
         try {
             return Optional.of(new Gson().fromJson(
@@ -104,7 +95,7 @@ public class MSTranslator implements ITranslator {
 
         Request request = new Request.Builder()
                 .url(urlTo).post(body)
-                .addHeader("Ocp-Apim-Subscription-Key", properties.getSubscriptionKey())
+                .addHeader("Ocp-Apim-Subscription-Key", properties.getTranslator().getSubscriptionKey())
                 .addHeader("Content-type", "application/json").build();
         Response response = client.newCall(request).execute();
         assert response.body() != null;

@@ -1,29 +1,40 @@
 package it.disco.unimib.suggester.service;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import it.disco.unimib.suggester.ConfigProperties;
+import it.disco.unimib.suggester.model.Suggestions;
+import okhttp3.*;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.LinkedHashMap;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.util.Objects.requireNonNull;
 
 @Service
 public class ABSTATService {
 
 
-    private String abstatBasePath;
-    private String[] preferredSummaries;
+    private final OkHttpClient client;
+    private ConfigProperties properties;
+    private List<String> preferredSummaries = new ArrayList<>();
     private static Pattern notAlphanumeric = Pattern.compile("[^a-z0-9]");
     private static Pattern spaces = Pattern.compile("\\s+");
 
-    public ABSTATService(String abstatBasePath, String[] preferredSummaries) {
-        this.abstatBasePath = abstatBasePath;
-        this.preferredSummaries = preferredSummaries.clone();
+    public ABSTATService(ConfigProperties properties, OkHttpClient client) {
+        this.properties = properties;
+        this.client = client;
     }
 
     public static String stringPreprocessing(String str) {
@@ -59,65 +70,57 @@ public class ABSTATService {
             postData.append('=');
             postData.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
         }
-        return postData.toString().getBytes("UTF-8");
+        return postData.toString().getBytes(StandardCharsets.UTF_8);
+    }
+
+    // This function prettifies the json response.
+    public static String prettify(String json_text) {
+        JsonParser parser = new JsonParser();
+        JsonElement json = parser.parse(json_text);
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        return gson.toJson(json);
     }
 
     //Dovrebbe tornare una lista, ma non riuscendo a testare l'endpoint
     //ritorno una stringa
-    private String abstatSuggestions(String keyword, String position)
-            throws MalformedURLException, UnsupportedEncodingException, IOException {
-        URL url = new URL(this.abstatBasePath + "/api/v1/SolrSuggestions");
-        Map<String, Object> params = new LinkedHashMap<>();
-        if (keyword != "" && position != "") {
-            params.put("qString", keyword);
-            params.put("qPosition", position);
-            params.put("rows", 15);
-            params.put("start", 0);
+    private String abstatSuggestions(String keyword, String position) throws IOException {
+        String url = properties.getSummarizer().getMainEndpoint() + "/api/v1/SolrSuggestions";
 
-            byte[] getData = getParamsString(params).toString().getBytes("UTF-8");
-            HttpURLConnection connection = (HttpURLConnection) (url.openConnection());
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            connection.setRequestProperty("Content-Length", String.valueOf(getData.length));
-            connection.setDoOutput(true);
-            connection.getOutputStream().write(getData);
 
-            Reader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
-            StringBuilder sb = new StringBuilder();
-            for (int c; (c = in.read()) >= 0; )
-                sb.append((char) c);
-            return sb.toString();
+        MediaType mediaType = MediaType.parse("application/json");
+
+
+        HttpUrl.Builder urlBuilder = requireNonNull(HttpUrl.parse(url)).newBuilder();
+        if (!Objects.equals(keyword, "") && (!Objects.equals(position, ""))) {
+            urlBuilder.addQueryParameter("qString", keyword);
+            urlBuilder.addQueryParameter("qPosition", position);
+            urlBuilder.addQueryParameter("rows", "15");
+            urlBuilder.addQueryParameter("start", "0");
+            String urlSuggestion = urlBuilder.build().toString();
+
+            Request request = new Request.Builder().url(urlSuggestion).get().build();
+            Response response = client.newCall(request).execute();
+            assert response.body() != null;
+            String bodyString = response.body().string();
+            System.out.println(prettify(bodyString));
+            return bodyString;
+
+
         }
         return "";
     }
 
     //Dovrebbe tornare una lista, ma non riuscendo a testare l'endpoint
     //ritorno una stringa
-    public String propertySuggestions(String keyword, boolean filter) throws IOException {
+    public Suggestions propertySuggestions(String keyword, boolean filter) throws IOException {
         keyword = filterURI(keyword);
-        if (filter)
-            keyword = stringPreprocessing(keyword);
-        return this.abstatSuggestions(keyword, "pred");
+        if (filter) keyword = stringPreprocessing(keyword);
+
+        String suggestions = this.abstatSuggestions(keyword, "pred");
+        //Type listType = new TypeToken<ArrayList<Suggestion>>(){}.getType();
+        Gson gson = new Gson();
+        return gson.fromJson(suggestions, Suggestions.class);
+
     }
 
-    //TODO
-    public String listSummaries() {
-        return "";
-    }
-
-    public String getAbstatBasePath() {
-        return abstatBasePath;
-    }
-
-    public void setAbstatBasePath(String abstatBasePath) {
-        this.abstatBasePath = abstatBasePath;
-    }
-
-    public String[] getPreferredSummaries() {
-        return preferredSummaries;
-    }
-
-    public void setPreferredSummaries(String[] preferredSummaries) {
-        this.preferredSummaries = preferredSummaries;
-    }
 }
