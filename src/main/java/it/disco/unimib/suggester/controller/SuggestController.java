@@ -1,12 +1,12 @@
 package it.disco.unimib.suggester.controller;
 
 
-import it.disco.unimib.suggester.model.Column;
-import it.disco.unimib.suggester.model.Header;
-import it.disco.unimib.suggester.model.TableSchema;
+import it.disco.unimib.suggester.model.table.Column;
+import it.disco.unimib.suggester.model.table.Header;
+import it.disco.unimib.suggester.model.table.TableSchema;
+import it.disco.unimib.suggester.model.translation.IDetectedLanguage;
 import it.disco.unimib.suggester.service.Orchestrator;
-import it.disco.unimib.suggester.translator.ITranslator;
-import it.disco.unimib.suggester.translator.domain.IDetectedLanguage;
+import it.disco.unimib.suggester.service.translator.ITranslator;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;

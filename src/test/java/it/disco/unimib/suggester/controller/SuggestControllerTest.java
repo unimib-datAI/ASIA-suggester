@@ -1,9 +1,9 @@
 package it.disco.unimib.suggester.controller;
 
 
-import it.disco.unimib.suggester.model.Column;
-import it.disco.unimib.suggester.model.Header;
-import it.disco.unimib.suggester.model.TableSchema;
+import it.disco.unimib.suggester.model.table.Column;
+import it.disco.unimib.suggester.model.table.Header;
+import it.disco.unimib.suggester.model.table.TableSchema;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

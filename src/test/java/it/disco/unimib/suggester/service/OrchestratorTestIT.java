@@ -1,6 +1,6 @@
 package it.disco.unimib.suggester.service;
 
-import it.disco.unimib.suggester.translator.domain.IDetectedLanguage;
+import it.disco.unimib.suggester.model.translation.IDetectedLanguage;
 import lombok.extern.java.Log;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,11 +1,11 @@
 package it.disco.unimib.suggester.service;
 
 import com.google.gson.Gson;
-import it.disco.unimib.suggester.model.LanguageType;
-import it.disco.unimib.suggester.translator.domain.IDetectedLanguage;
-import it.disco.unimib.suggester.translator.domain.ILookedupTerm;
-import it.disco.unimib.suggester.translator.domain.ITranslation;
-import it.disco.unimib.suggester.translator.implementation.microsoftTranslate.MSTranslator;
+import it.disco.unimib.suggester.model.translation.IDetectedLanguage;
+import it.disco.unimib.suggester.model.translation.ILookedupTerm;
+import it.disco.unimib.suggester.model.translation.ITranslation;
+import it.disco.unimib.suggester.model.translation.LanguageType;
+import it.disco.unimib.suggester.service.translator.mstranslate.MSTranslator;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

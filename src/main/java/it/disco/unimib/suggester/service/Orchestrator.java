@@ -1,13 +1,13 @@
 package it.disco.unimib.suggester.service;
 
 
-import it.disco.unimib.suggester.model.Column;
-import it.disco.unimib.suggester.model.Header;
-import it.disco.unimib.suggester.model.LanguageType;
-import it.disco.unimib.suggester.model.TableSchema;
-import it.disco.unimib.suggester.translator.ITranslator;
-import it.disco.unimib.suggester.translator.domain.IDetectedLanguage;
-import it.disco.unimib.suggester.translator.domain.ILookedupTerm;
+import it.disco.unimib.suggester.model.table.Column;
+import it.disco.unimib.suggester.model.table.Header;
+import it.disco.unimib.suggester.model.table.TableSchema;
+import it.disco.unimib.suggester.model.translation.IDetectedLanguage;
+import it.disco.unimib.suggester.model.translation.ILookedupTerm;
+import it.disco.unimib.suggester.model.translation.LanguageType;
+import it.disco.unimib.suggester.service.translator.ITranslator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
