@@ -2,7 +2,7 @@ package it.disco.unimib.suggester.translator.implementation.microsoftTranslate;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import it.disco.unimib.suggester.ConfigProperties;
+import it.disco.unimib.suggester.Configuration.ConfigProperties;
 import it.disco.unimib.suggester.model.LanguageType;
 import it.disco.unimib.suggester.translator.ITranslator;
 import it.disco.unimib.suggester.translator.domain.IDetectedLanguage;
@@ -10,6 +10,7 @@ import it.disco.unimib.suggester.translator.domain.ILookedupTerm;
 import it.disco.unimib.suggester.translator.domain.ITranslation;
 import it.disco.unimib.suggester.translator.implementation.microsoftTranslate.domain.DetectMessage;
 import it.disco.unimib.suggester.translator.implementation.microsoftTranslate.domain.LookupMessage;
+import it.disco.unimib.suggester.translator.implementation.microsoftTranslate.domain.TextToTranslate;
 import it.disco.unimib.suggester.translator.implementation.microsoftTranslate.domain.TranslateMessage;
 import okhttp3.*;
 import org.springframework.stereotype.Component;
@@ -17,8 +18,8 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -28,12 +29,15 @@ public class MSTranslator implements ITranslator {
 
     private final OkHttpClient client;
 
+    private boolean test = false;
+
+    private Gson gson = new Gson();
+
     public MSTranslator(OkHttpClient client, ConfigProperties properties) {
 
         this.client = client;
         this.properties = properties;
     }
-
 
 
     private static List<TextToTranslate> toTranslateList(List<String> textList) {
@@ -42,8 +46,13 @@ public class MSTranslator implements ITranslator {
     }
 
     @Override
+    public void setTest(boolean test) {
+        this.test = test;
+    }
+
+    @Override
     public List<IDetectedLanguage> detect(List<String> textList) {
-        String url = properties.getTranslator().getMainEndpoint() + "/" + properties.getTranslator().getDetectEndpoint();
+        String url = properties.getTranslator().getFullDetectEndpoint();
         String language = null;
         try {
             language = post(toTranslateList(textList), url);
@@ -52,15 +61,14 @@ public class MSTranslator implements ITranslator {
         }
         Type listType = new TypeToken<ArrayList<DetectMessage>>() {
         }.getType();
-        Gson gson = new Gson();
         return gson.fromJson(language, listType);
     }
 
     @Override
     public List<ITranslation> translate(List<String> textList, LanguageType destLang) throws IOException {
-        System.out.println(destLang.toString());
-        String url = properties.getTranslator().getMainEndpoint() + "/" + properties.getTranslator().getTranslateEndpoint() + "&to=de,it";
-        return new Gson().fromJson(
+        if (test) System.out.println(destLang.toString());
+        String url = properties.getTranslator().getFullTranslateEndpoint() + "&to=de,it";
+        return gson.fromJson(
                 post(toTranslateList(textList), url),
                 new TypeToken<ArrayList<TranslateMessage>>() {
                 }.getType());
@@ -68,27 +76,26 @@ public class MSTranslator implements ITranslator {
     }
 
     @Override
-    public Optional<List<ILookedupTerm>> lookup(List<String> textList, LanguageType sourceLang, LanguageType destLang) {
+    public List<ILookedupTerm> lookup(List<String> textList, LanguageType sourceLang, LanguageType destLang) {
         String fromTo = String.format("from=%s&to=%s", sourceLang.toString(), destLang.toString());
-        String url = properties.getTranslator().getMainEndpoint() + "/" + properties.getTranslator().getLookupEndpoint() + "&" + fromTo;
+        String url = properties.getTranslator().getFullLookupEndpoint() + "&" + fromTo;
 
         try {
-            return Optional.of(new Gson().fromJson(
+            return gson.fromJson(
                     post(toTranslateList(textList), url),
                     new TypeToken<ArrayList<LookupMessage>>() {
-                    }.getType()));
+                    }.getType());
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return Optional.empty();
+        return Collections.emptyList();
     }
 
     // This function performs a POST request.
     private String post(List<TextToTranslate> listTextToTranslate, String urlTo) throws IOException {
         MediaType mediaType = MediaType.parse("application/json");
 
-        Gson gson = new Gson();
         String json = gson.toJson(listTextToTranslate);
 
         RequestBody body = RequestBody.create(mediaType, json);

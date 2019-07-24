@@ -14,11 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -94,14 +92,14 @@ public class Orchestrator {
 
 
     java.util.List<Pair<String, Double>> lookup(String processedString) {
-        Optional<List<Pair<String, Double>>> optList = translator.lookup(singletonList(processedString), LanguageType.IT, LanguageType.EN)
-                .map(l -> l.get(0).getTranslations().stream()
-                        .map(t -> Pair.of(
-                                t.getTarget(),
-                                t.getConfidence()))
-                        .collect(Collectors.toList()));
-
-        return optList.orElseGet((Supplier<? extends List<Pair<String, Double>>>) new ArrayList<Pair<String, Double>>());
+        return translator
+                .lookup(singletonList(processedString), LanguageType.IT, LanguageType.EN)
+                .get(0).getTranslations()
+                .stream()
+                .map(t -> Pair.of(
+                        t.getTarget(),
+                        t.getConfidence()))
+                .collect(Collectors.toList());
 
     }
 
@@ -113,28 +111,31 @@ public class Orchestrator {
     }
 
     private TableSchema setTranslatedWords(TableSchema schema) {
-        Stream<Pair<Optional<List<ILookedupTerm>>, Header>> optionalStream = schema.getColumnList()
+        Stream<Pair<List<ILookedupTerm>, Header>> pairStream = schema.getColumnList()
                 .stream().map(Column::getHeader)
                 .map(header -> Pair.of(header.getSplitTerms(), header)) // Pair List<String, LanguageType> per header
                 .map(p -> Pair.of(translator.lookup(p.getFirst(), p.getSecond().getLanguage(), LanguageType.EN), p.getSecond()));
 
 
-        optionalStream
-                .forEach(h -> h.getFirst()
-                        .ifPresent(l -> {
-                            Optional<List<Pair<String, Pair<Double, Integer>>>> reduced =
-                                    l.stream()
-                                            .map(lu -> lu.getTranslations().stream()
-                                                    .map(t -> Pair.of(t.getTarget(),
-                                                            Pair.of(t.getConfidence(), 1)))
-                                                    .collect(Collectors.toList()))
-                                            .peek(System.out::println)
-                                            .reduce(this::combineLists);
+        pairStream
+                .forEach(h -> {
+                    Optional<List<Pair<String, Pair<Double, Integer>>>> reduced =
+                            h.getFirst().
+                                    stream()
+                                    .map(lu -> lu.getTranslations().stream()
+                                            .map(t -> Pair.of(t.getTarget(),
+                                                    Pair.of(t.getConfidence(), 1)))
+                                            .collect(Collectors.toList()))
+                                    .peek(System.out::println)
+                                    .reduce(this::combineLists);
+
+
                             reduced.ifPresent(r -> h.getSecond().setTranslatedWord(r.stream()
                                     .map(p -> Pair.of(p.getFirst(), p.getSecond().getFirst() / p.getSecond().getSecond()))
                                     .sorted((p1, p2) -> p2.getSecond().compareTo(p1.getSecond())).collect(Collectors.toList())));
                             System.out.println(reduced);
-                        }));
+
+                });
         return schema;
     }
 

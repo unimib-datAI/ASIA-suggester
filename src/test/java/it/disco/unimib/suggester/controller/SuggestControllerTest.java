@@ -4,14 +4,12 @@ package it.disco.unimib.suggester.controller;
 import it.disco.unimib.suggester.model.Column;
 import it.disco.unimib.suggester.model.Header;
 import it.disco.unimib.suggester.model.TableSchema;
-import it.disco.unimib.suggester.translator.ITranslator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -31,9 +29,11 @@ public class SuggestControllerTest {
     private MockMvc mockMvc;
 
 
+/*
     @MockBean
     private ITranslator translator;
 
+*/
 
     @Test
     public void putTranslation() throws Exception {
@@ -44,7 +44,9 @@ public class SuggestControllerTest {
         TableSchema schema = new TableSchema();
         schema.addColumn(column);
 
-        mockMvc.perform(put("/api/suggester/translate", schema)).andDo(print()).andExpect(status().isOk());
+        mockMvc.perform(put("/api/suggester/translate", schema))
+                .andDo(print())
+                .andExpect(status().isOk());
 
 
     }
