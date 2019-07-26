@@ -19,12 +19,16 @@ import okhttp3.Response;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
+import static java.util.Collections.emptyList;
+import static java.util.Comparator.comparing;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Service
@@ -35,9 +39,17 @@ public class ABSTATISuggester implements ISuggester {
     @Getter
     @Setter
     private boolean test = false;
+
     @Getter
     @Setter
     private List<String> preferredSummaries;
+
+
+    @Override
+    public void setPreferredSummaries(List<String> preferredSummaries) {
+        this.preferredSummaries = preferredSummaries;
+    }
+
     private ConfigProperties properties;
     private static Pattern notAlphanumeric = Pattern.compile("[^a-z0-9]");
     private static Pattern spaces = Pattern.compile("\\s+");
@@ -104,13 +116,12 @@ public class ABSTATISuggester implements ISuggester {
             return gson.fromJson(suggestions, Suggestions.class).getSuggestions();
         } catch (IOException e) {
             e.printStackTrace();
-            return Collections.emptyList();
+            return emptyList();
         }
     }
 
 
-    @Override
-    public Datasets summaries() throws IOException {
+    private Datasets summaries() throws IOException {
         String url = properties.getSummarizer().getFullDatasetsEndpoint();
         HttpUrl.Builder urlBuilder = requireNonNull(HttpUrl.parse(url)).newBuilder();
         String strDatasets = getString(urlBuilder);
@@ -161,6 +172,16 @@ public class ABSTATISuggester implements ISuggester {
         return listSuggestionsMultipleKeywords(keywords, filter, Position.SUBJ);
     }
 
+    @Override
+    public List<String> getSummaries() {
+        try {
+            return summaries().getDatasetsNames();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return emptyList();
+        }
+    }
+
 
     private List<Suggestion> listSuggestionsMultipleKeywords(@NonNull List<String> keywords, boolean filter, @NonNull Position position) {
         return keywords.stream()
@@ -168,8 +189,8 @@ public class ABSTATISuggester implements ISuggester {
                 .filter(suggestions -> !isEmpty(suggestions))
                 .flatMap(Collection::stream)
                 .distinct()
-                .sorted(Comparator.comparing(Suggestion::getOccurrence))
-                .collect(Collectors.toList());
+                .sorted(comparing(Suggestion::getOccurrence))
+                .collect(toList());
     }
 
     enum Position {
@@ -184,8 +205,6 @@ public class ABSTATISuggester implements ISuggester {
             return value;
         }
     }
-
-
 
 
 }

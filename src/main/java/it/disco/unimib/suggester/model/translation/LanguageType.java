@@ -1,5 +1,7 @@
 package it.disco.unimib.suggester.model.translation;
 
+import java.util.Arrays;
+
 public enum LanguageType {
     EN("en"),
     FR("fr"),
@@ -23,6 +25,11 @@ public enum LanguageType {
             }
         }
         return LanguageType.UNKNOWN;
+    }
+
+    public static boolean checkSupportedLanguage(LanguageType type) {
+        if (type == null) return false;
+        return Arrays.stream(LanguageType.values()).anyMatch(currentType -> currentType.equals(type));
     }
 
     public static void main(String[] args) {

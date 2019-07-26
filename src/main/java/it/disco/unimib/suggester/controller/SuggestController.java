@@ -2,22 +2,18 @@ package it.disco.unimib.suggester.controller;
 
 
 import it.disco.unimib.suggester.model.table.Column;
-import it.disco.unimib.suggester.model.table.Header;
 import it.disco.unimib.suggester.model.table.TableSchema;
-import it.disco.unimib.suggester.model.translation.IDetectedLanguage;
 import it.disco.unimib.suggester.service.Orchestrator;
 import it.disco.unimib.suggester.service.translator.ITranslator;
 import lombok.Getter;
 import lombok.Setter;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.util.Arrays;
 import java.util.List;
 
-import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.joining;
 
 @RestController
 @RequestMapping("/api/suggester")
@@ -36,20 +32,27 @@ public class SuggestController {
         this.orchestrator = orchestrator;
     }
 
-    @PutMapping("/translate")
-    public TableSchema putTranslateSchema(@RequestBody TableSchema schema) {
-        return orchestrator.translateSchema(schema);
+    @PutMapping(value = "/translate", consumes = "application/json", produces = "application/json")
+    public TableSchema putTranslateSchema(@Valid @RequestBody TableSchema schema, @RequestParam(name = "preferredSummaries[]", required = false) String[] preferredSummaries) {
+        if (test) {
+            String summaries = Arrays.asList(preferredSummaries).stream().collect(joining(","));
+            System.out.println(summaries);
+        }
+        return orchestrator.translateAndSuggest(schema, Arrays.asList(preferredSummaries));
 
     }
 
 
-    @PutMapping("translateColumn")
-    public Column putTranslateColumn(@NotNull @RequestBody Column column) {
+    @PutMapping("/translateColumn")
+    public Column putTranslateColumn(@Valid @RequestBody Column column) {
         if (test) System.out.println(column.toString());
-        Header header = column.getHeader();
-        List<IDetectedLanguage> detectedLanguages = translator.detect(singletonList(header.getOriginalWord()));
-        header.setLanguage(detectedLanguages.get(0).getLanguageEnum());
-        return column;
+        return orchestrator.translateColumn(column);
+    }
+
+
+    @GetMapping(value = "/summaries", produces = "application/json")
+    public List<String> getSummaries() {
+        return orchestrator.getAvailableSummaries();
     }
 
 

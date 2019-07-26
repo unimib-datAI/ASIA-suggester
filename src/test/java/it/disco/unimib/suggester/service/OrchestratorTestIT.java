@@ -31,7 +31,7 @@ public class OrchestratorTestIT {
 
     @Test
     public void lookup() {
-        orchestrator.lookup("casa").forEach(stringDoublePair -> System.out.println(stringDoublePair.getFirst()));
+        orchestrator.lookup("casa").forEach(stringDoublePair -> System.out.println(stringDoublePair.getTranslatedWord()));
     }
 
 

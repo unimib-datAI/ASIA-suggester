@@ -1,14 +1,11 @@
 package it.disco.unimib.suggester.service.suggester;
 
 import it.disco.unimib.suggester.model.suggestion.Suggestion;
-import it.disco.unimib.suggester.service.suggester.abstat.domain.Datasets;
 import lombok.NonNull;
 
-import java.io.IOException;
 import java.util.List;
 
 public interface ISuggester {
-    Datasets summaries() throws IOException;
 
     List<Suggestion> propertySuggestions(@NonNull String keyword, boolean filter);
 
@@ -26,5 +23,7 @@ public interface ISuggester {
 
     void setTest(boolean test);
 
-    List<String> getPreferredSummaries();
+    void setPreferredSummaries(List<String> preferredSummaries);
+
+    List<String> getSummaries();
 }

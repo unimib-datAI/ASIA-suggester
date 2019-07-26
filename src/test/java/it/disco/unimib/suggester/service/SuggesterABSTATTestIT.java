@@ -2,7 +2,6 @@ package it.disco.unimib.suggester.service;
 
 import it.disco.unimib.suggester.model.suggestion.Suggestion;
 import it.disco.unimib.suggester.service.suggester.ISuggester;
-import it.disco.unimib.suggester.service.suggester.abstat.domain.Datasets;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,6 +37,9 @@ public class SuggesterABSTATTestIT {
         assertFalse(isEmpty(suggestions));
         assertEquals(suggestions.get(0).getPrefix(), "foaf");
 
+        List<Suggestion> homeGarden = suggesterAbstat.propertySuggestions("HomeGarden", true);
+        assertTrue(isEmpty(homeGarden));
+
     }
 
 
@@ -45,15 +47,13 @@ public class SuggesterABSTATTestIT {
     public void propertySuggestionsMultipleKeywords() {
         List<Suggestion> suggestions = suggesterAbstat.propertySuggestionsMultipleKeywords(Arrays.asList("home", "house"), true);
         assertFalse(isEmpty(suggestions));
-
-
     }
 
     @Test
     public void abstatListSummaries() throws IOException {
         suggesterAbstat.setTest(true);
-        Datasets datasets = suggesterAbstat.summaries();
-        assertEquals(datasets.getDatasetsNames().get(0), "linkedgeodata");
+        List<String> datasets = suggesterAbstat.getSummaries();
+        assertEquals(datasets.get(0), "linkedgeodata");
     }
 
     @Test
@@ -66,6 +66,5 @@ public class SuggesterABSTATTestIT {
     public void typeSuggestionsMultipleKeywords() {
         List<Suggestion> suggestions = suggesterAbstat.typeSuggestionsMultipleKeywords(Arrays.asList("home", "house"), true);
         assertFalse(isEmpty(suggestions));
-
     }
 }
