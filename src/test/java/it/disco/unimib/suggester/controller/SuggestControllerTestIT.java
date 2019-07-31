@@ -64,6 +64,7 @@ public class SuggestControllerTestIT {
         response.getBody().prettyPrint();
 
         response.then().body("columnList[0].header.language", equalTo(LanguageType.IT.toString()));
+
     }
 
     @Test

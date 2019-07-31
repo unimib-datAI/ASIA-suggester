@@ -8,11 +8,15 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.*;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
@@ -33,11 +37,11 @@ public class SuggesterABSTATTestIT {
     @Test
     public void propertySuggestions() {
 
-        List<Suggestion> suggestions = suggesterAbstat.propertySuggestions("home", true);
+        List<Suggestion> suggestions = suggesterAbstat.propertySuggestions("home");
         assertFalse(isEmpty(suggestions));
         assertEquals(suggestions.get(0).getPrefix(), "foaf");
 
-        List<Suggestion> homeGarden = suggesterAbstat.propertySuggestions("HomeGarden", true);
+        List<Suggestion> homeGarden = suggesterAbstat.propertySuggestions("HomeGarden");
         assertTrue(isEmpty(homeGarden));
 
     }
@@ -45,7 +49,13 @@ public class SuggesterABSTATTestIT {
 
     @Test
     public void propertySuggestionsMultipleKeywords() {
-        List<Suggestion> suggestions = suggesterAbstat.propertySuggestionsMultipleKeywords(Arrays.asList("home", "house"), true);
+        List<Suggestion> suggestions =
+                suggesterAbstat.propertySuggestionsMultipleKeywords(Arrays.asList("home", "house"))
+                        .stream()
+                        .filter(suggestion -> !StringUtils.isEmpty(suggestion))
+                        .flatMap(Collection::stream)
+                        .distinct()
+                        .sorted(comparing(Suggestion::getOccurrence)).collect(toList());
         assertFalse(isEmpty(suggestions));
     }
 
@@ -58,13 +68,18 @@ public class SuggesterABSTATTestIT {
 
     @Test
     public void typeSuggestions() {
-        List<Suggestion> suggestions = suggesterAbstat.typeSuggestions("home", true);
+        List<Suggestion> suggestions = suggesterAbstat.typeSuggestions("home");
         assertTrue(isEmpty(suggestions));
     }
 
     @Test
     public void typeSuggestionsMultipleKeywords() {
-        List<Suggestion> suggestions = suggesterAbstat.typeSuggestionsMultipleKeywords(Arrays.asList("home", "house"), true);
+        List<Suggestion> suggestions = suggesterAbstat.typeSuggestionsMultipleKeywords(Arrays.asList("home", "house"))
+                .stream()
+                .filter(suggestion -> !StringUtils.isEmpty(suggestion))
+                .flatMap(Collection::stream)
+                .distinct()
+                .sorted(comparing(Suggestion::getOccurrence)).collect(toList());
         assertFalse(isEmpty(suggestions));
     }
 }

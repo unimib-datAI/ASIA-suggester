@@ -6,4 +6,8 @@ public interface ILookedupTermTarget {
     Double getConfidence();
 
     String getType();
+
+    default Integer getNumWords() {
+        return getTarget().split("\\s").length;
+    }
 }

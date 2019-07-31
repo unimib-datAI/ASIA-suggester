@@ -18,6 +18,7 @@ public class Header {
     private List<String> splitTerms;
     private List<TranslatedWord> translatedPhrases;
     private List<TranslatedWord> translatedWords;
+    private List<TranslatedWord> manipulatedTranslatedPhrases;
     private LanguageType language;
     private List<Suggestion> suggestions;
 }

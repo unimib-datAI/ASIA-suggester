@@ -33,7 +33,8 @@ public class SuggestController {
     }
 
     @PutMapping(value = "/translate", consumes = "application/json", produces = "application/json")
-    public TableSchema putTranslateSchema(@Valid @RequestBody TableSchema schema, @RequestParam(name = "preferredSummaries[]", required = false) String[] preferredSummaries) {
+    public TableSchema putTranslateSchema(@Valid @RequestBody TableSchema schema,
+                                          @RequestParam(name = "preferredSummaries[]", required = false) String[] preferredSummaries) {
         if (test) {
             String summaries = Arrays.asList(preferredSummaries).stream().collect(joining(","));
             System.out.println(summaries);

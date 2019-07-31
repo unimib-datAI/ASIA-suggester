@@ -19,14 +19,12 @@ import okhttp3.Response;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.util.Collections.emptyList;
-import static java.util.Comparator.comparing;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -34,26 +32,17 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 @Service
 public class ABSTATISuggester implements ISuggester {
 
+    private static Pattern notAlphanumeric = Pattern.compile("[^a-z0-9]");
+    private static Pattern spaces = Pattern.compile("\\s+");
     private final Gson gson = new Gson();
     private final OkHttpClient client;
     @Getter
     @Setter
     private boolean test = false;
-
     @Getter
     @Setter
     private List<String> preferredSummaries;
-
-
-    @Override
-    public void setPreferredSummaries(List<String> preferredSummaries) {
-        this.preferredSummaries = preferredSummaries;
-    }
-
     private ConfigProperties properties;
-    private static Pattern notAlphanumeric = Pattern.compile("[^a-z0-9]");
-    private static Pattern spaces = Pattern.compile("\\s+");
-
     public ABSTATISuggester(ConfigProperties properties, OkHttpClient client) {
         this.properties = properties;
         this.client = client;
@@ -64,9 +53,9 @@ public class ABSTATISuggester implements ISuggester {
         str = m.replaceAll(" ");
         m = spaces.matcher(str);
         str = m.replaceAll(" ");
-        String[] words = str.split(" ");
-        for (int i = 1; i < words.length; i++)
-            words[i] = words[i].substring(0, 1).toUpperCase() + words[i].substring(1);
+        //   String[] words = str.split(" ");
+        //    for (int i = 1; i < words.length; i++)
+        //        words[i] = words[i].substring(0, 1).toUpperCase() + words[i].substring(1);
         return str;
     }
 
@@ -80,13 +69,57 @@ public class ABSTATISuggester implements ISuggester {
         return URI;
     }
 
-
     // This function prettifies the json response.
     private static String prettify(String json_text) {
         JsonParser parser = new JsonParser();
         JsonElement json = parser.parse(json_text);
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         return gson.toJson(json);
+    }
+
+    @Override
+    public void setPreferredSummaries(List<String> preferredSummaries) {
+        this.preferredSummaries = preferredSummaries;
+    }
+
+    @Override
+    public List<Suggestion> propertySuggestions(@NonNull String keyword) {
+        return abstatListSuggestions(keyword, Position.PRED);
+    }
+
+    @Override
+    public List<Suggestion> typeSuggestions(@NonNull String keyword) {
+        return abstatListSuggestions(keyword, Position.SUBJ);
+    }
+
+    @Override
+    public List<Suggestion> objectSuggestions(@NonNull String keyword) {
+        return abstatListSuggestions(keyword, Position.OBJ);
+    }
+
+    @Override
+    public List<List<Suggestion>> objectSuggestionsMultipleKeywords(@NonNull List<String> keywords) {
+        return listSuggestionsMultipleKeywords(keywords, Position.OBJ);
+    }
+
+    @Override
+    public List<List<Suggestion>> propertySuggestionsMultipleKeywords(@NonNull List<String> keywords) {
+        return listSuggestionsMultipleKeywords(keywords, Position.PRED);
+    }
+
+    @Override
+    public List<List<Suggestion>> typeSuggestionsMultipleKeywords(@NonNull List<String> keywords) {
+        return listSuggestionsMultipleKeywords(keywords, Position.SUBJ);
+    }
+
+    @Override
+    public List<String> getSummaries() {
+        try {
+            return summaries().getDatasetsNames();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return emptyList();
+        }
     }
 
     private String abstatSuggestions(@NonNull String keyword, @NonNull Position position) throws IOException {
@@ -107,19 +140,22 @@ public class ABSTATISuggester implements ISuggester {
         return "";
     }
 
-    private List<Suggestion> abstatListSuggestions(String keyword, boolean filter, Position position) {
+    private List<Suggestion> abstatListSuggestions(String keyword, Position position) {
         keyword = filterURI(keyword);
-        if (filter) keyword = stringPreprocessing(keyword);
 
         try {
             String suggestions = this.abstatSuggestions(keyword, position);
-            return gson.fromJson(suggestions, Suggestions.class).getSuggestions();
+            List<Suggestion> suggestionList = gson.fromJson(suggestions, Suggestions.class).getSuggestions();
+            String finalKeyword = keyword;
+            suggestionList.forEach(suggestion -> suggestion.setSearchedKeyword(finalKeyword));
+            suggestionList.forEach(suggestion -> suggestion.setPositionDataset(!isEmpty(preferredSummaries) ?
+                    preferredSummaries.indexOf(suggestion.getDataset()) : -1));
+            return suggestionList;
         } catch (IOException e) {
             e.printStackTrace();
             return emptyList();
         }
     }
-
 
     private Datasets summaries() throws IOException {
         String url = properties.getSummarizer().getFullDatasetsEndpoint();
@@ -140,56 +176,9 @@ public class ABSTATISuggester implements ISuggester {
         return bodyString;
     }
 
-
-    @Override
-    public List<Suggestion> propertySuggestions(@NonNull String keyword, boolean filter) {
-        return abstatListSuggestions(keyword, filter, Position.PRED);
-    }
-
-    @Override
-    public List<Suggestion> typeSuggestions(@NonNull String keyword, boolean filter) {
-        return abstatListSuggestions(keyword, filter, Position.SUBJ);
-    }
-
-    @Override
-    public List<Suggestion> objectSuggestions(@NonNull String keyword, boolean filter) {
-        return abstatListSuggestions(keyword, filter, Position.OBJ);
-    }
-
-    @Override
-    public List<Suggestion> objectSuggestionsMultipleKeywords(@NonNull List<String> keywords, boolean filter) {
-        return listSuggestionsMultipleKeywords(keywords, filter, Position.OBJ);
-    }
-
-
-    @Override
-    public List<Suggestion> propertySuggestionsMultipleKeywords(@NonNull List<String> keywords, boolean filter) {
-        return listSuggestionsMultipleKeywords(keywords, filter, Position.PRED);
-    }
-
-    @Override
-    public List<Suggestion> typeSuggestionsMultipleKeywords(@NonNull List<String> keywords, boolean filter) {
-        return listSuggestionsMultipleKeywords(keywords, filter, Position.SUBJ);
-    }
-
-    @Override
-    public List<String> getSummaries() {
-        try {
-            return summaries().getDatasetsNames();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return emptyList();
-        }
-    }
-
-
-    private List<Suggestion> listSuggestionsMultipleKeywords(@NonNull List<String> keywords, boolean filter, @NonNull Position position) {
+    private List<List<Suggestion>> listSuggestionsMultipleKeywords(@NonNull List<String> keywords, @NonNull Position position) {
         return keywords.stream()
-                .map(k -> abstatListSuggestions(k, filter, position))
-                .filter(suggestions -> !isEmpty(suggestions))
-                .flatMap(Collection::stream)
-                .distinct()
-                .sorted(comparing(Suggestion::getOccurrence))
+                .map(k -> abstatListSuggestions(k, position))
                 .collect(toList());
     }
 

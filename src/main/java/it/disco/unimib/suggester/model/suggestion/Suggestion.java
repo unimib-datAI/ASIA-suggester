@@ -13,5 +13,7 @@ public class Suggestion {
     private String namespace;
     private Long occurrence;
     private String dataset;
+    private Integer positionDataset;
+    private String searchedKeyword;
 
 }

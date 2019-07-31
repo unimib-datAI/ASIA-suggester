@@ -7,17 +7,17 @@ import java.util.List;
 
 public interface ISuggester {
 
-    List<Suggestion> propertySuggestions(@NonNull String keyword, boolean filter);
+    List<Suggestion> propertySuggestions(@NonNull String keyword);
 
-    List<Suggestion> typeSuggestions(@NonNull String keyword, boolean filter);
+    List<Suggestion> typeSuggestions(@NonNull String keyword);
 
-    List<Suggestion> objectSuggestions(@NonNull String keyword, boolean filter);
+    List<Suggestion> objectSuggestions(@NonNull String keyword);
 
-    List<Suggestion> objectSuggestionsMultipleKeywords(@NonNull List<String> keywords, boolean filter);
+    List<List<Suggestion>> objectSuggestionsMultipleKeywords(@NonNull List<String> keywords);
 
-    List<Suggestion> propertySuggestionsMultipleKeywords(@NonNull List<String> keywords, boolean filter);
+    List<List<Suggestion>> propertySuggestionsMultipleKeywords(@NonNull List<String> keywords);
 
-    List<Suggestion> typeSuggestionsMultipleKeywords(@NonNull List<String> keywords, boolean filter);
+    List<List<Suggestion>> typeSuggestionsMultipleKeywords(@NonNull List<String> keywords);
 
     boolean isTest();
 
