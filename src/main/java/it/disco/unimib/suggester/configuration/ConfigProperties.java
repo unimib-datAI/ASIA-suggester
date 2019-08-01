@@ -61,6 +61,10 @@ public class ConfigProperties {
         @NotNull
         private String lookupEndpoint;
 
+        private Double translatedWordThreshold = 0.0;
+
+        private Double translatedPhrasesThreshold = 0.0;
+
         public String getFullDetectEndpoint() {
             return mainEndpoint + "/" + detectEndpoint;
         }

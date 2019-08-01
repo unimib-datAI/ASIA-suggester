@@ -1,10 +1,12 @@
 package it.disco.unimib.suggester.service;
 
+import it.disco.unimib.suggester.configuration.ConfigProperties;
 import it.disco.unimib.suggester.model.table.*;
 import it.disco.unimib.suggester.model.translation.ILookedupTerm;
 import it.disco.unimib.suggester.model.translation.LanguageType;
 import org.paukov.combinatorics3.Generator;
 import org.springframework.data.util.Pair;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -12,12 +14,20 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static java.util.Arrays.asList;
 import static java.util.Comparator.comparing;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
+@Component
 public class OrchestratorUtils {
+
+    private static ConfigProperties properties;
+
+    public OrchestratorUtils(ConfigProperties properties) {
+        OrchestratorUtils.properties = properties;
+    }
 
     static String headerPreProcessing(String rawHeader) {
 
@@ -61,6 +71,8 @@ public class OrchestratorUtils {
     }
 
     static void setTranslatedPhrases(Pair<List<ILookedupTerm>, Header> h) {
+
+
         Optional<List<Pair<String, Pair<Double, Integer>>>> reduced =
                 h.getFirst().stream()
                         .map(lu -> lu.getTranslations()
@@ -76,14 +88,16 @@ public class OrchestratorUtils {
                         .reduce(OrchestratorUtils::combineLists);
 
 
+        Double translatePhraseThreshold = properties.getTranslator().getTranslatedPhrasesThreshold();
         reduced.ifPresent(r -> h.getSecond().setTranslatedPhrases(
                 r.stream()
                         .map(p -> TranslatedWord.of(
-                                p.getFirst(),
+                                asList(p.getFirst()),
                                 p.getSecond().getFirst() / p.getSecond().getSecond(),
                                 p.getFirst().split("\\s").length
                                 )
                         )
+                        .filter(translatedWord -> translatedWord.getConfidence() >= translatePhraseThreshold)
                         .sorted((p1, p2) -> p2.getConfidence().compareTo(p1.getConfidence()))
                         .collect(toList())));
         System.out.println(reduced);
@@ -95,21 +109,26 @@ public class OrchestratorUtils {
     }
 
     static void setTranslatedWords(Pair<List<ILookedupTerm>, Header> pair) {
+        Double translatedWordThreshold = properties.getTranslator().getTranslatedWordThreshold();
+
         pair.getSecond()
                 .setTranslatedWords(pair.getFirst()
                         .stream()
                         .flatMap(lu ->
                                 lu.getTranslations().stream()
-                                        .map(t -> TranslatedWord.of(t.getTarget(),
+                                        .map(t -> TranslatedWord.of(
+                                                asList(t.getTarget()),
                                                 t.getConfidence(),
                                                 t.getNumWords()
-                                        )))
+                                        ))
+                                        .filter(translatedWord -> translatedWord.getConfidence() >= translatedWordThreshold)
+                        )
                         .sorted(comparing(TranslatedWord::getConfidence).reversed())
                         .collect(toList()));
     }
 
     static List<List<String>> generatePhrasesCombinatoriallyFromTranslatedWord(TranslatedWord phrase) {
-        return Generator.subset(phrase.getTranslatedWord().split("\\s"))
+        return Generator.subset(phrase.getTranslatedWord().get(0).split("\\s"))
                 .simple().stream()
                 .filter(s -> !s.isEmpty())
                 .map(l -> Generator.permutation(l).simple().stream())
@@ -130,19 +149,20 @@ public class OrchestratorUtils {
                 .map(w -> Pair.of(w, w.size()))
                 .collect(toList());
 
-        Stream<TranslatedWord> stringStream = collect.stream()
-                .map(pair -> TranslatedWord.of(
-                        pair.getFirst().stream().collect(joining(" ")),
-                        Double.NaN,
-                        pair.getSecond()));
 
         Stream<TranslatedWord> stringStreamJoined = collect.stream()
                 .map(pair -> TranslatedWord.of(
-                        pair.getFirst().stream().collect(joining()),
+                        asList(pair.getFirst().stream().collect(joining()),
+                                pair.getFirst().stream().collect(joining("_")),
+                                pair.getFirst().stream().collect(joining("%3A")),
+                                pair.getFirst().stream().collect(joining("%20"))
+
+                        ).stream().distinct().collect(toList()),
                         Double.NaN,
                         pair.getSecond()
-                ));
-        List<TranslatedWord> manipulatedTranlatedPhrases = Stream.concat(stringStream, stringStreamJoined)
+                        )
+                );
+        List<TranslatedWord> manipulatedTranlatedPhrases = stringStreamJoined
                 .distinct()
                 .sorted(comparing(TranslatedWord::getNumOfWords).reversed()).collect(toList());
         header.setManipulatedTranslatedPhrases(manipulatedTranlatedPhrases);

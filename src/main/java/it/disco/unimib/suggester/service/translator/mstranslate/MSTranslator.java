@@ -20,15 +20,14 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class MSTranslator implements ITranslator {
 
-    private ConfigProperties properties;
-
     private final OkHttpClient client;
-
+    private ConfigProperties properties;
     private boolean test = false;
 
     private Gson gson = new Gson();
@@ -41,7 +40,7 @@ public class MSTranslator implements ITranslator {
 
 
     private static List<TextToTranslate> toTranslateList(List<String> textList) {
-        return textList.stream().map(TextToTranslate::new).collect(Collectors.toList());
+        return textList.stream().map(TextToTranslate::new).collect(toList());
 
     }
 
@@ -81,10 +80,11 @@ public class MSTranslator implements ITranslator {
         String url = properties.getTranslator().getFullLookupEndpoint() + "&" + fromTo;
 
         try {
-            return gson.fromJson(
+            List<ILookedupTerm> iLookedupTerms = gson.fromJson(
                     post(toTranslateList(textList), url),
                     new TypeToken<ArrayList<LookupMessage>>() {
                     }.getType());
+            return iLookedupTerms;
         } catch (IOException e) {
             e.printStackTrace();
         }

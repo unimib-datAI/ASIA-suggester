@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import it.disco.unimib.suggester.configuration.ConfigProperties;
+import it.disco.unimib.suggester.configuration.SuggesterConfiguration;
 import it.disco.unimib.suggester.model.suggestion.Suggestion;
 import it.disco.unimib.suggester.service.suggester.ISuggester;
 import it.disco.unimib.suggester.service.suggester.abstat.domain.Datasets;
@@ -40,12 +41,14 @@ public class ABSTATISuggester implements ISuggester {
     @Setter
     private boolean test = false;
     @Getter
-    @Setter
     private List<String> preferredSummaries;
     private ConfigProperties properties;
-    public ABSTATISuggester(ConfigProperties properties, OkHttpClient client) {
+    private SuggesterConfiguration.DistanceCalculator distanceCalculator;
+
+    public ABSTATISuggester(ConfigProperties properties, OkHttpClient client, SuggesterConfiguration.DistanceCalculator distanceCalculator) {
         this.properties = properties;
         this.client = client;
+        this.distanceCalculator = distanceCalculator;
     }
 
     private static String stringPreprocessing(String str) {
@@ -61,7 +64,7 @@ public class ABSTATISuggester implements ISuggester {
 
     private static String filterURI(String URI) {
         if (URI.startsWith("http")) {
-            int slashIdx = URI.lastIndexOf('/');
+            int slashIdx = URI.lastIndexOf('/') + 1;
             int hashIdx = URI.lastIndexOf('#');
             int colonIdx = URI.lastIndexOf(':');
             URI = URI.substring(Math.max(slashIdx, Math.max(hashIdx, colonIdx)));
@@ -150,6 +153,17 @@ public class ABSTATISuggester implements ISuggester {
             suggestionList.forEach(suggestion -> suggestion.setSearchedKeyword(finalKeyword));
             suggestionList.forEach(suggestion -> suggestion.setPositionDataset(!isEmpty(preferredSummaries) ?
                     preferredSummaries.indexOf(suggestion.getDataset()) : -1));
+            suggestionList.forEach(suggestion -> suggestion.setEntityName(filterURI(suggestion.getSuggestion())));
+            //Math.max(finalKeyword.length(),suggestion.getEntityName().length());
+            suggestionList.forEach(suggestion -> {
+                int max = Math.max(finalKeyword.length(), suggestion.getEntityName().length());
+                int min = Math.min(finalKeyword.length(), suggestion.getEntityName().length());
+                suggestion.setRatioIndex((double) min / max);
+            });
+
+            suggestionList.forEach(suggestion -> suggestion.setDistances(
+                    distanceCalculator.apply(finalKeyword.toLowerCase(), suggestion.getEntityName().toLowerCase())));
+
             return suggestionList;
         } catch (IOException e) {
             e.printStackTrace();

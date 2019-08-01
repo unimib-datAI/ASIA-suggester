@@ -20,5 +20,7 @@ public class Header {
     private List<TranslatedWord> translatedWords;
     private List<TranslatedWord> manipulatedTranslatedPhrases;
     private LanguageType language;
-    private List<Suggestion> suggestions;
+    private List<Suggestion> propertySuggestions;
+    private List<Suggestion> objectSuggestions;
+    private List<Suggestion> subjectSuggestions;
 }

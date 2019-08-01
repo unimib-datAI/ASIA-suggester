@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 import static it.disco.unimib.suggester.model.translation.LanguageType.*;
@@ -21,6 +22,7 @@ import static it.disco.unimib.suggester.service.OrchestratorUtils.setProcessedWo
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Comparator.comparing;
+import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.*;
 import static org.springframework.util.StringUtils.isEmpty;
@@ -28,6 +30,16 @@ import static org.springframework.util.StringUtils.isEmpty;
 
 @Service
 public class Orchestrator {
+
+
+    private static final long LIMIT_SUGGESTIONS = 15;
+    private final Comparator<Suggestion> comparator1 =
+            comparing(Suggestion::getPositionDataset)
+                    .thenComparing(Suggestion::getCalculatedIndex)
+                    .thenComparing(new Suggestion.SuggestionComparatorByDistanceVector())
+                    .thenComparing(Suggestion::getSearchedKeywordLength, reverseOrder())
+                    .thenComparing(Suggestion::getRatioIndex, reverseOrder())
+                    .thenComparing(Suggestion::getOccurrence, reverseOrder());
 
 
     private ITranslator translator;
@@ -49,7 +61,7 @@ public class Orchestrator {
 
     public String translate(String processedString) throws IOException {
         translator.translate(singletonList(processedString), EN);
-
+        // TODO: 2019-08-01 check this
         return null;
     }
 
@@ -64,14 +76,66 @@ public class Orchestrator {
     public TableSchema translateAndSuggest(TableSchema schema, List<String> preferredSummaries) {
         translateTableSchema(schema);
         suggestPredicates(schema, preferredSummaries);
+        suggestSubjects(schema, preferredSummaries);
+        suggestObjects(schema, preferredSummaries);
         return schema;
     }
 
-    private Column detectLanguageForColumn(Column column) {
-        Header header = column.getHeader();
-        if (!checkSupportedLanguage(header.getLanguage()))
-            header.setLanguage(translator.detect(asList(header.getProcessedWord())).get(0).getLanguageEnum());
-        return column;
+    private void suggestObjects(TableSchema schema, List<String> preferredSummaries) {
+        schema.getColumnList().stream().forEach(column -> updateColumnWithSuggestedObjects(column, preferredSummaries));
+    }
+
+    private void updateColumnWithSuggestedObjects(Column column, List<String> preferredSummaries) {
+        List<String> keywords = column.getHeader()
+                .getManipulatedTranslatedPhrases()
+                .stream()
+                .map(TranslatedWord::getTranslatedWord)
+                .flatMap(Collection::stream)
+                .collect(toList());
+
+        suggester.setPreferredSummaries(preferredSummaries);
+        List<Suggestion> suggestions = suggester
+                .objectSuggestionsMultipleKeywords(keywords)
+                .stream()
+                .filter(suggestion -> !isEmpty(suggestion))
+                .flatMap(Collection::stream)
+                .distinct()
+                .sorted(comparator1)
+                .limit(LIMIT_SUGGESTIONS)
+                .collect(toList());
+
+
+        suggester.setPreferredSummaries(null);
+        column.getHeader().setObjectSuggestions(suggestions);
+    }
+
+    private void suggestSubjects(TableSchema schema, List<String> preferredSummaries) {
+        schema.getColumnList().stream().forEach(column -> updateColumnWithSuggestedSubjects(column, preferredSummaries));
+    }
+
+    private void updateColumnWithSuggestedSubjects(Column column, List<String> preferredSummaries) {
+
+        List<String> keywords = column.getHeader()
+                .getManipulatedTranslatedPhrases()
+                .stream()
+                .map(TranslatedWord::getTranslatedWord)
+                .flatMap(Collection::stream)
+                .collect(toList());
+
+        suggester.setPreferredSummaries(preferredSummaries);
+        List<Suggestion> suggestions = suggester
+                .typeSuggestionsMultipleKeywords(keywords)
+                .stream()
+                .filter(suggestion -> !isEmpty(suggestion))
+                .flatMap(Collection::stream)
+                .distinct()
+                .sorted(comparator1)
+                .limit(LIMIT_SUGGESTIONS)
+                .collect(toList());
+
+
+        suggester.setPreferredSummaries(null);
+        column.getHeader().setSubjectSuggestions(suggestions);
     }
 
     public TableSchema translateTableSchema(TableSchema schema) {
@@ -79,6 +143,13 @@ public class Orchestrator {
                 setSplitTerms(
                         detectLanguagesForTableSchema(
                                 setProcessedWords(schema))));
+    }
+
+    private Column detectLanguageForColumn(Column column) {
+        Header header = column.getHeader();
+        if (!checkSupportedLanguage(header.getLanguage()))
+            header.setLanguage(translator.detect(asList(header.getProcessedWord())).get(0).getLanguageEnum());
+        return column;
     }
 
     private TableSchema setTranslatedWords(TableSchema schema) {
@@ -93,6 +164,7 @@ public class Orchestrator {
                                     translator.lookup(p.getFirst(), p.getSecond().getLanguage(), EN),
                                     p.getSecond()))
                             .collect(toList());
+
 
             listPairTranslatedTermsHeader.forEach(OrchestratorUtils::setTranslatedWords);
 
@@ -109,25 +181,36 @@ public class Orchestrator {
     }
 
 
-
-
     private void suggestPredicates(TableSchema schema, List<String> preferredSummaries) {
         schema.getColumnList().stream().forEach(column -> updateColumnWithSuggestedPredicate(column, preferredSummaries));
     }
 
     private void updateColumnWithSuggestedPredicate(Column column, List<String> preferredSummaries) {
 
-        List<String> words = column.getHeader().getTranslatedPhrases().stream().map(TranslatedWord::getTranslatedWord).collect(toList());
+        List<String> keywords = column.getHeader()
+                .getManipulatedTranslatedPhrases()
+                .stream()
+                .map(TranslatedWord::getTranslatedWord)
+                .flatMap(Collection::stream)
+                .collect(toList());
+
         suggester.setPreferredSummaries(preferredSummaries);
-        List<Suggestion> suggestions = suggester.propertySuggestionsMultipleKeywords(words).stream()
+        List<Suggestion> suggestions = suggester
+                .propertySuggestionsMultipleKeywords(keywords)
+                .stream()
                 .filter(suggestion -> !isEmpty(suggestion))
                 .flatMap(Collection::stream)
                 .distinct()
-                .sorted(comparing(Suggestion::getOccurrence)).collect(toList());
+                .sorted(comparator1)
+                .limit(LIMIT_SUGGESTIONS)
+                .collect(toList());
+
+
         suggester.setPreferredSummaries(null);
-        column.getHeader().setSuggestions(suggestions);
+        column.getHeader().setPropertySuggestions(suggestions);
 
     }
+
 
     private Header setTranslatedWords(Header header) {
         LanguageType lang = header.getLanguage();
@@ -172,10 +255,12 @@ public class Orchestrator {
                 .get(0).getTranslations()
                 .stream()
                 .map(t -> TranslatedWord.of(
-                        t.getTarget(),
+                        asList(t.getTarget()),
                         t.getConfidence(),
                         t.getNumWords()))
                 .collect(toList());
 
     }
+
+
 }
