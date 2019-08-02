@@ -9,16 +9,13 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 import static java.util.Comparator.comparing;
 import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.*;
 
 @Component
 public class OrchestratorUtils {
@@ -63,10 +60,15 @@ public class OrchestratorUtils {
                 .collect(toList());
     }
 
+    static Column setProcessedWords(Column column) {
+        Header header = column.getHeader();
+        header.setProcessedWord(headerPreProcessing(header.getOriginalWord()));
+        return column;
+    }
+
     static TableSchema setProcessedWords(TableSchema schema) {
         List<Column> columnList = schema.getColumnList();
-        columnList.stream().map(Column::getHeader)
-                .forEach(header -> header.setProcessedWord(headerPreProcessing(header.getOriginalWord())));
+        columnList.forEach(OrchestratorUtils::setProcessedWords);
         return schema;
     }
 
@@ -92,7 +94,7 @@ public class OrchestratorUtils {
         reduced.ifPresent(r -> h.getSecond().setTranslatedPhrases(
                 r.stream()
                         .map(p -> TranslatedWord.of(
-                                asList(p.getFirst()),
+                                Collections.singletonList(p.getFirst()),
                                 p.getSecond().getFirst() / p.getSecond().getSecond(),
                                 p.getFirst().split("\\s").length
                                 )
@@ -104,7 +106,7 @@ public class OrchestratorUtils {
     }
 
 
-    static LanguageWithStats createLanguageWithStats(Map.Entry<LanguageType, Long> languageTypeEntry) {
+    private static LanguageWithStats createLanguageWithStats(Map.Entry<LanguageType, Long> languageTypeEntry) {
         return new LanguageWithStats(languageTypeEntry.getKey(), (double) languageTypeEntry.getValue());
     }
 
@@ -117,7 +119,7 @@ public class OrchestratorUtils {
                         .flatMap(lu ->
                                 lu.getTranslations().stream()
                                         .map(t -> TranslatedWord.of(
-                                                asList(t.getTarget()),
+                                                Collections.singletonList(t.getTarget()),
                                                 t.getConfidence(),
                                                 t.getNumWords()
                                         ))
@@ -127,24 +129,24 @@ public class OrchestratorUtils {
                         .collect(toList()));
     }
 
-    static List<List<String>> generatePhrasesCombinatoriallyFromTranslatedWord(TranslatedWord phrase) {
+    private static List<List<String>> generatePhrasesCombinatoriallyFromTranslatedWord(TranslatedWord phrase) {
         return Generator.subset(phrase.getTranslatedWord().get(0).split("\\s"))
                 .simple().stream()
                 .filter(s -> !s.isEmpty())
                 .map(l -> Generator.permutation(l).simple().stream())
                 .flatMap(identity())
-                .map(l -> l.stream().collect(toList()))
+                .map(ArrayList::new)
                 .distinct()
                 .collect(toList());
     }
 
-    static Header generateAndSetPhrasesCombinatorially(Header header) {
+    static void generateAndSetPhrasesCombinatorially(Header header) {
 
         List<Pair<List<String>, Integer>> collect = header
                 .getTranslatedPhrases()
                 .stream()
                 .map(OrchestratorUtils::generatePhrasesCombinatoriallyFromTranslatedWord)
-                .flatMap(l -> l.stream())
+                .flatMap(Collection::stream)
                 .distinct()
                 .map(w -> Pair.of(w, w.size()))
                 .collect(toList());
@@ -152,21 +154,58 @@ public class OrchestratorUtils {
 
         Stream<TranslatedWord> stringStreamJoined = collect.stream()
                 .map(pair -> TranslatedWord.of(
-                        asList(pair.getFirst().stream().collect(joining()),
-                                pair.getFirst().stream().collect(joining("_")),
-                                pair.getFirst().stream().collect(joining("%3A")),
-                                pair.getFirst().stream().collect(joining("%20"))
-
-                        ).stream().distinct().collect(toList()),
+                        joiningVariousWays(pair.getFirst()).stream().distinct().collect(toList()),
                         Double.NaN,
                         pair.getSecond()
                         )
                 );
-        List<TranslatedWord> manipulatedTranlatedPhrases = stringStreamJoined
+        List<TranslatedWord> manipulatedTranslatedPhrases = stringStreamJoined
                 .distinct()
                 .sorted(comparing(TranslatedWord::getNumOfWords).reversed()).collect(toList());
-        header.setManipulatedTranslatedPhrases(manipulatedTranlatedPhrases);
-        return header;
+        header.setManipulatedTranslatedPhrases(manipulatedTranslatedPhrases);
     }
 
+    static List<String> joiningVariousWays(List<String> stringList) {
+
+        return asList(String.join("", stringList),
+                String.join("_", stringList),
+                String.join("%3A", stringList),
+                String.join("%20", stringList));
+    }
+
+
+    static Column setSplitTerms(Column column) {
+        Header header = column.getHeader();
+        header.setSplitTerms(asList(header.getProcessedWord().split("\\s")));
+        return column;
+    }
+
+    static TableSchema setSplitTerms(TableSchema schema) {
+
+        schema.getColumnList().forEach(OrchestratorUtils::setSplitTerms);
+//                map(Column::getHeader)
+//                .forEach(header -> header.setSplitTerms(asList(header.getProcessedWord().split("\\s"))));
+        return schema;
+    }
+
+
+    static void setSameLanguageAllColumns(TableSchema schema) {
+        schema.getColumnList()
+                .stream()
+                .map(Column::getHeader)
+                .forEach(header -> header.setLanguage(schema.getLanguage()));
+    }
+
+    static void calculateAndSetLanguageWithStatistics(TableSchema schema) {
+        schema.setLanguageWithStatsList(
+                schema.getColumnList().stream()
+                        .map(column -> column.getHeader().getLanguage())
+                        .collect(groupingBy(identity(), counting()))
+                        .entrySet().stream()
+                        .map(OrchestratorUtils::createLanguageWithStats)
+                        .sorted(comparing(LanguageWithStats::getFrequency).reversed())
+                        .collect(toList())
+        );
+        schema.setLanguage(schema.getLanguageWithStatsList().get(0).getLanguageType());
+    }
 }

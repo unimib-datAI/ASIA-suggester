@@ -26,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
+@SuppressWarnings("SpellCheckingInspection")
 @RunWith(SpringRunner.class)
 @WebMvcTest(SuggestController.class)
 //@AutoConfigureMockMvc
@@ -45,7 +46,6 @@ public class SuggestControllerTest {
 
     @MockBean
     private Orchestrator orchestrator;
-    private TableSchema returnedSchema;
     private String json;
     private TableSchema schema;
 
@@ -72,7 +72,7 @@ public class SuggestControllerTest {
                 "{\"translatedWord\":\"HomeYard\",\"confidence\":0.28355}]," +
                 "\"language\":\"IT\"},\"dataType\":null}]}";
 
-        returnedSchema = mapper.readValue(json, TableSchema.class);
+        TableSchema returnedSchema = mapper.readValue(json, TableSchema.class);
         Mockito.when(orchestrator.translateTableSchema(Mockito.any(TableSchema.class)))
                 .thenReturn(returnedSchema);
     }

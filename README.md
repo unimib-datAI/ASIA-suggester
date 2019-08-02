@@ -1,4 +1,4 @@
 # Multi-language Annotation Suggester (ASIA-MAS)
 
 This project implements a multi-language header suggestion service to be implemented in [Grafterizer](https://github.com/UNIMIBInside/asia-backend) and [ASIA](https://github.com/UNIMIBInside/asia-backend).
-This work is part of EuBussinessGraph EU project. 
+This work is part of EuBusinessGraph EU project. 

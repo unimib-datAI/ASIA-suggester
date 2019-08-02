@@ -33,8 +33,8 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 @Service
 public class ABSTATISuggester implements ISuggester {
 
-    private static Pattern notAlphanumeric = Pattern.compile("[^a-z0-9]");
-    private static Pattern spaces = Pattern.compile("\\s+");
+    private static final Pattern notAlphanumeric = Pattern.compile("[^a-z0-9]");
+    private static final Pattern spaces = Pattern.compile("\\s+");
     private final Gson gson = new Gson();
     private final OkHttpClient client;
     @Getter
@@ -42,8 +42,8 @@ public class ABSTATISuggester implements ISuggester {
     private boolean test = false;
     @Getter
     private List<String> preferredSummaries;
-    private ConfigProperties properties;
-    private SuggesterConfiguration.DistanceCalculator distanceCalculator;
+    private final ConfigProperties properties;
+    private final SuggesterConfiguration.DistanceCalculator distanceCalculator;
 
     public ABSTATISuggester(ConfigProperties properties, OkHttpClient client, SuggesterConfiguration.DistanceCalculator distanceCalculator) {
         this.properties = properties;
@@ -198,13 +198,13 @@ public class ABSTATISuggester implements ISuggester {
 
     enum Position {
         PRED("pred"), SUBJ("subj"), OBJ("obj");
-        private String value;
+        private final String value;
 
         Position(String value) {
             this.value = value;
         }
 
-        public String getValue() {
+        String getValue() {
             return value;
         }
     }

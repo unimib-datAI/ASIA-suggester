@@ -23,14 +23,15 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
+@SuppressWarnings("SpellCheckingInspection")
 @Service
 public class MSTranslator implements ITranslator {
 
     private final OkHttpClient client;
-    private ConfigProperties properties;
+    private final ConfigProperties properties;
     private boolean test = false;
 
-    private Gson gson = new Gson();
+    private final Gson gson = new Gson();
 
     public MSTranslator(OkHttpClient client, ConfigProperties properties) {
 
@@ -80,11 +81,10 @@ public class MSTranslator implements ITranslator {
         String url = properties.getTranslator().getFullLookupEndpoint() + "&" + fromTo;
 
         try {
-            List<ILookedupTerm> iLookedupTerms = gson.fromJson(
+            return gson.fromJson(
                     post(toTranslateList(textList), url),
                     new TypeToken<ArrayList<LookupMessage>>() {
                     }.getType());
-            return iLookedupTerms;
         } catch (IOException e) {
             e.printStackTrace();
         }

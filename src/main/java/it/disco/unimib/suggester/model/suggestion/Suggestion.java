@@ -4,10 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import static java.util.Arrays.asList;
 
 @Data
 @NoArgsConstructor
@@ -23,7 +22,7 @@ public class Suggestion {
     private String searchedKeyword;
     private Double ratioIndex = Double.NaN;
     private Double calculatedIndex = Double.NaN;
-    private List<Double> distances = asList(Double.NaN);
+    private List<Double> distances = Collections.singletonList(Double.NaN);
 
     public Integer getSearchedKeywordLength() {
         return searchedKeyword.length();

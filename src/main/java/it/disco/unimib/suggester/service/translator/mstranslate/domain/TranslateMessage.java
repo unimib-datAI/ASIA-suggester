@@ -40,7 +40,7 @@ public class TranslateMessage implements ITranslation {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    private class DetectedLanguage {
+    private static class DetectedLanguage {
         private String language;
         private Double score;
     }
@@ -49,7 +49,7 @@ public class TranslateMessage implements ITranslation {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public class Translation implements ITranslationBase {
+    public static class Translation implements ITranslationBase {
         private String text;
         private String to;
 

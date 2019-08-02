@@ -31,7 +31,7 @@ public class LookupMessage implements ILookedupTerm {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public class LookupTranslationMessage implements ILookedupTermTarget {
+    public static class LookupTranslationMessage implements ILookedupTermTarget {
         private String normalizedTarget;
         private String displayTarget;
         private String posTag;
@@ -58,7 +58,7 @@ public class LookupMessage implements ILookedupTerm {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    private class LookupBackTranslations {
+    private static class LookupBackTranslations {
         private String normalizedText;
         private String displayText;
         private Integer numExamples;

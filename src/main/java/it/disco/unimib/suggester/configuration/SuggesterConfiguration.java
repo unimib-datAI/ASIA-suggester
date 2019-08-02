@@ -25,9 +25,10 @@ public class SuggesterConfiguration {
         return new DistanceCalculator();
     }
 
+    @SuppressWarnings("SpellCheckingInspection")
     @Data
     @NoArgsConstructor
-    public class DistanceCalculator {
+    public static class DistanceCalculator {
         private final JaroWinklerDistance jaroWinkler = new JaroWinklerDistance();
         private final CosineDistance cosineDistance = new CosineDistance();
         private final HammingDistance hammingDistance = new HammingDistance();
@@ -39,8 +40,8 @@ public class SuggesterConfiguration {
             String stringALow = stringA.toLowerCase();
             String stringBLow = stringB.toLowerCase();
             return asList(
-                    1 / jaroWinkler.apply(stringALow, stringBLow).doubleValue(),
-                    cosineDistance.apply(stringALow, stringBLow).doubleValue(),
+                    1 / jaroWinkler.apply(stringALow, stringBLow),
+                    cosineDistance.apply(stringALow, stringBLow),
                     stringALow.length() == stringBLow.length() ? hammingDistance.apply(stringALow, stringBLow).doubleValue() : 0,
                     levenshteinDistance.apply(stringALow, stringBLow).doubleValue(),
                     longestCommonSubsequenceDistance.apply(stringALow, stringBLow).doubleValue()

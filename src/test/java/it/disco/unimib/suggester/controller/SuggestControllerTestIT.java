@@ -21,6 +21,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
 
+@SuppressWarnings("SpellCheckingInspection")
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Log
@@ -28,38 +29,49 @@ public class SuggestControllerTestIT {
 
     @LocalServerPort
     private int port;
-    private TableSchema schema;
-    private Column column;
+    private Column columnITA;
 
     @Autowired
     private SuggestController controller;
+    private Column columnENG;
+    private TableSchema tableSchemaENG;
+    private TableSchema tableSchemaITA;
 
     @Before
-    public void setBaseUri() {
+    public void setupForTest() {
         RestAssured.port = port;
         System.out.println(RestAssured.port);
         baseURI = "http://localhost"; // replace as appropriate
 
-        Header header = new Header();
-        header.setOriginalWord("CasaGiardino");
-        column = new Column();
-        column.setHeader(header);
-        schema = new TableSchema();
-        schema.addColumn(column);
+        Header headerITA = new Header();
+        headerITA.setOriginalWord("CasaGiardino");
+        columnITA = new Column();
+        columnITA.setHeader(headerITA);
+        tableSchemaITA = new TableSchema();
+        tableSchemaITA.addColumn(columnITA);
+
+        Header headerENG = new Header();
+        headerENG.setOriginalWord("HomeAndGarden");
+        columnENG = new Column();
+        columnENG.setHeader(headerENG);
+        tableSchemaENG = new TableSchema();
+        tableSchemaENG.addColumn(columnENG);
+        tableSchemaENG.setLanguage(LanguageType.EN);
+        tableSchemaENG.setForceSingleLanguage(true);
         controller.setTest(true);
 
     }
 
 
     @Test
-    public void putTranslation() {
+    public void putTranslationTableSchemaITA() {
 
         Response response = given()
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
-                .body(schema)
+                .body(tableSchemaITA)
                 .param("preferredSummaries[]", new String[]{"linkedgeodata", "dbpedia-2016-10"})
-                .put("/api/suggester/translate");
+                .put("/suggester/api/schema/translate");
 
         response.getBody().prettyPrint();
 
@@ -68,19 +80,45 @@ public class SuggestControllerTestIT {
     }
 
     @Test
-    public void putTranslationColumn() {
+    public void putTranslationTableSchemaENG() {
+
+        Response response = given()
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .body(tableSchemaENG)
+                .param("preferredSummaries[]", new String[]{"linkedgeodata", "dbpedia-2016-10"})
+                .put("/suggester/api/schema/translate");
+
+        response.getBody().prettyPrint();
+
+        response.then().body("columnList[0].header.language", equalTo(LanguageType.EN.toString()));
+
+    }
+
+    @Test
+    public void putTranslationColumnITA() {
         Response response =
                 given()
                         .contentType(ContentType.JSON)
-                        .body(column)
-                        .put("/api/suggester/translateColumn");
+                        .body(columnITA)
+                        .put("/suggester/api/column/translate");
+        response.getBody().prettyPrint();
+    }
+
+    @Test
+    public void putTranslationColumnENG() {
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .body(columnENG)
+                        .put("/suggester/api/column/translate");
         response.getBody().prettyPrint();
     }
 
 
     @Test
     public void getSummaries() {
-        given().contentType(ContentType.JSON).get("/api/suggester/summaries").getBody().prettyPrint();
+        given().contentType(ContentType.JSON).get("/suggester/api/summaries").getBody().prettyPrint();
     }
 
 }

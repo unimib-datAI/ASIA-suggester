@@ -12,7 +12,7 @@ public enum LanguageType {
     UNKNOWN("unknown");
 
 
-    private String language;
+    private final String language;
 
     LanguageType(String lang) {
         this.language = lang;
@@ -29,7 +29,7 @@ public enum LanguageType {
 
     public static boolean checkSupportedLanguage(LanguageType type) {
         if (type == null) return false;
-        return Arrays.stream(LanguageType.values()).anyMatch(currentType -> currentType.equals(type));
+        return Arrays.asList(LanguageType.values()).contains(type);
     }
 
     public static void main(String[] args) {
@@ -40,7 +40,7 @@ public enum LanguageType {
 
     }
 
-    public String getLanguage() {
+    private String getLanguage() {
         return language;
     }
 

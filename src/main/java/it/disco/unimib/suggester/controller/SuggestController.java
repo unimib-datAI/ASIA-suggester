@@ -4,50 +4,52 @@ package it.disco.unimib.suggester.controller;
 import it.disco.unimib.suggester.model.table.Column;
 import it.disco.unimib.suggester.model.table.TableSchema;
 import it.disco.unimib.suggester.service.Orchestrator;
-import it.disco.unimib.suggester.service.translator.ITranslator;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Arrays;
 import java.util.List;
 
-import static java.util.stream.Collectors.joining;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 
 @RestController
-@RequestMapping("/api/suggester")
+@RequestMapping("/suggester/api")
 public class SuggestController {
 
     @Getter
     @Setter
     private boolean test = false;
 
-    private ITranslator translator;
-    private Orchestrator orchestrator;
+    private final Orchestrator orchestrator;
 
 
-    public SuggestController(ITranslator translator, Orchestrator orchestrator) {
-        this.translator = translator;
+    public SuggestController(Orchestrator orchestrator) {
         this.orchestrator = orchestrator;
     }
 
-    @PutMapping(value = "/translate", consumes = "application/json", produces = "application/json")
+    @PutMapping(value = "/schema/translate", consumes = "application/json", produces = "application/json")
     public TableSchema putTranslateSchema(@Valid @RequestBody TableSchema schema,
                                           @RequestParam(name = "preferredSummaries[]", required = false) String[] preferredSummaries) {
         if (test) {
-            String summaries = Arrays.asList(preferredSummaries).stream().collect(joining(","));
+            String summaries = String.join(",", asList(preferredSummaries));
             System.out.println(summaries);
         }
-        return orchestrator.translateAndSuggest(schema, Arrays.asList(preferredSummaries));
-
+        return preferredSummaries != null
+                ? orchestrator.translateAndSuggest(schema, asList(preferredSummaries))
+                : orchestrator.translateAndSuggest(schema, emptyList());
     }
 
 
-    @PutMapping("/translateColumn")
-    public Column putTranslateColumn(@Valid @RequestBody Column column) {
+    @PutMapping(value = "column/translate", consumes = "application/json", produces = "application/json")
+    public Column putTranslateColumn(@Valid @RequestBody Column column,
+                                     @RequestParam(name = "preferredSummaries[]", required = false) String[] preferredSummaries) {
         if (test) System.out.println(column.toString());
-        return orchestrator.translateColumn(column);
+
+        return preferredSummaries != null
+                ? orchestrator.translateAndSuggest(column, asList(preferredSummaries))
+                : orchestrator.translateAndSuggest(column, emptyList());
     }
 
 

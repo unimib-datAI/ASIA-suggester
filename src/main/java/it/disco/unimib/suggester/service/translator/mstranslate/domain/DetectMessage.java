@@ -32,7 +32,7 @@ public class DetectMessage implements IDetectedLanguage {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public class DetectMessageBase implements IDetectedLanguageBase {
+    public static class DetectMessageBase implements IDetectedLanguageBase {
         private String language;
         private Double score;
         private Boolean isTranslationSupported;

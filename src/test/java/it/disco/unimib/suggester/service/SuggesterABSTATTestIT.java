@@ -10,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.StringUtils;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -21,6 +20,7 @@ import static org.junit.Assert.*;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 
+@SuppressWarnings("SpellCheckingInspection")
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class SuggesterABSTATTestIT {
@@ -60,7 +60,7 @@ public class SuggesterABSTATTestIT {
     }
 
     @Test
-    public void abstatListSummaries() throws IOException {
+    public void abstatListSummaries() {
         suggesterAbstat.setTest(true);
         List<String> datasets = suggesterAbstat.getSummaries();
         assertEquals(datasets.get(0), "linkedgeodata");

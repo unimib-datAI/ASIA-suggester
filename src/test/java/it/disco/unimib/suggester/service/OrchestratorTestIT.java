@@ -4,6 +4,7 @@ import it.disco.unimib.suggester.model.table.Column;
 import it.disco.unimib.suggester.model.table.Header;
 import it.disco.unimib.suggester.model.table.TableSchema;
 import it.disco.unimib.suggester.model.translation.IDetectedLanguage;
+import it.disco.unimib.suggester.model.translation.LanguageType;
 import lombok.extern.java.Log;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
+@SuppressWarnings("SpellCheckingInspection")
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @Log
@@ -38,23 +40,19 @@ public class OrchestratorTestIT {
     @Test
     //old
     public void lookup() {
-        orchestrator.lookup("casa").forEach(stringDoublePair -> System.out.println(stringDoublePair.getTranslatedWord()));
+        orchestrator.lookup("casa", LanguageType.IT).forEach(stringDoublePair -> System.out.println(stringDoublePair.getTranslatedWord()));
     }
 
 
     @Test
-    public void translate() {
-    }
-
-    @Test
-    public void generatephrasesCombinatorially() {
+    public void generatePhrasesCombinatorially() {
         List<String> listWithDuplicates = Arrays.asList("AA", "BB", "AA", "BB");
         List<String> listWithoutDuplicates =
                 listWithDuplicates.stream()
                         .distinct()
                         .collect(Collectors.toList());
 
-        listWithoutDuplicates.forEach(l -> System.out.println(l));
+        listWithoutDuplicates.forEach(System.out::println);
 
 
         Header header = new Header();
