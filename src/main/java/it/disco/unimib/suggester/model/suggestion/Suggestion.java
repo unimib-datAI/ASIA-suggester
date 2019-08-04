@@ -22,6 +22,7 @@ public class Suggestion {
     private String searchedKeyword;
     private Double ratioIndex = Double.NaN;
     private Double calculatedIndex = Double.NaN;
+    private Double suggesterScore = Double.NaN;
     private List<Double> distances = Collections.singletonList(Double.NaN);
 
     public Integer getSearchedKeywordLength() {

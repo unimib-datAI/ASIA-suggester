@@ -12,12 +12,14 @@ import it.disco.unimib.suggester.model.translation.LanguageType;
 import it.disco.unimib.suggester.service.suggester.ISuggester;
 import it.disco.unimib.suggester.service.translator.ITranslator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -38,6 +40,7 @@ public class Orchestrator {
     private final Comparator<Suggestion> comparator1 =
             comparing(Suggestion::getPositionDataset)
                     .thenComparing(Suggestion::getCalculatedIndex)
+                    .thenComparing(Suggestion::getSuggesterScore, reverseOrder())
                     .thenComparing(new Suggestion.SuggestionComparatorByDistanceVector())
                     .thenComparing(Suggestion::getSearchedKeywordLength, reverseOrder())
                     .thenComparing(Suggestion::getRatioIndex, reverseOrder())
@@ -45,34 +48,57 @@ public class Orchestrator {
 
 
     private final ITranslator translator;
-    private final ISuggester suggester;
+
+    private final ISuggester suggesterABSTAT;
+
+    private final ISuggester suggesterLOV;
+
+    private String activeSuggester = "abstat";
 
     @Autowired
-    public Orchestrator(ITranslator translator, ISuggester suggester) {
+    public Orchestrator(ITranslator translator,
+                        @Qualifier("ABSTATSuggester") ISuggester suggesterABSTAT,
+                        @Qualifier("LOVSuggester") ISuggester suggesterLOV) {
         this.translator = translator;
-        this.suggester = suggester;
+        this.suggesterABSTAT = suggesterABSTAT;
+        this.suggesterLOV = suggesterLOV;
     }
 
-
-    public Column translateAndSuggest(Column column, List<String> preferredSummaries) {
+    public Column translateAndSuggest(Column column, List<String> preferredSummaries, String suggester) {
 
         translateColumn(column);
+        if (Objects.nonNull(suggester)) this.activeSuggester = suggester;
         suggestPredicates(column, preferredSummaries);
         suggestSubjects(column, preferredSummaries);
         suggestObjects(column, preferredSummaries);
+        this.activeSuggester = "abstat";
         return column;
     }
 
-    public List<String> getAvailableSummaries() {
-        return suggester.getSummaries();
+    public List<String> getAvailableSummaries(String suggester) {
+        if (Objects.nonNull(suggester)) this.activeSuggester = suggester;
+        List<String> res = getAvailableSummaries();
+        this.activeSuggester = "abstat";
+        return res;
     }
 
-    public TableSchema translateAndSuggest(TableSchema schema, List<String> preferredSummaries) {
+    public TableSchema translateAndSuggest(TableSchema schema, List<String> preferredSummaries, String suggester) {
         translateTableSchema(schema);
+
+        if (Objects.nonNull(suggester)) this.activeSuggester = suggester;
         suggestPredicates(schema, preferredSummaries);
         suggestSubjects(schema, preferredSummaries);
         suggestObjects(schema, preferredSummaries);
+        this.activeSuggester = "abstat";
         return schema;
+    }
+
+    private List<String> getAvailableSummaries() {
+        return getActiveSuggester().getSummaries();
+    }
+
+    private ISuggester getActiveSuggester() {
+        return "abstat".equalsIgnoreCase(activeSuggester) ? suggesterABSTAT : suggesterLOV;
     }
 
     public TableSchema translateTableSchema(TableSchema schema) {
@@ -93,7 +119,7 @@ public class Orchestrator {
         updateColumnWithSuggestions(
                 column,
                 preferredSummaries,
-                suggester::objectSuggestionsMultipleKeywords,
+                getActiveSuggester()::objectSuggestionsMultipleKeywords,
                 column.getHeader()::setObjectSuggestions);
     }
 
@@ -107,7 +133,7 @@ public class Orchestrator {
         updateColumnWithSuggestions(
                 column,
                 preferredSummaries,
-                suggester::typeSuggestionsMultipleKeywords,
+                getActiveSuggester()::typeSuggestionsMultipleKeywords,
                 column.getHeader()::setSubjectSuggestions
         );
     }
@@ -136,8 +162,8 @@ public class Orchestrator {
                             header);
 
             OrchestratorUtils.setTranslatedWords(pair);
-            OrchestratorUtils.setTranslatedPhrases(pair);
-            OrchestratorUtils.generateAndSetPhrasesCombinatorially(header);
+            setTranslatedPhrases(pair);
+            generateAndSetPhrasesCombinatorially(header);
         } else {
             List<TranslatedWord> translatedWords = singletonList(TranslatedWord.of(
                     joiningVariousWays(header.getSplitTerms()),
@@ -175,7 +201,7 @@ public class Orchestrator {
         updateColumnWithSuggestions(
                 column,
                 preferredSummaries,
-                suggester::propertySuggestionsMultipleKeywords,
+                getActiveSuggester()::propertySuggestionsMultipleKeywords,
                 column.getHeader()::setPropertySuggestions);
     }
 
@@ -198,7 +224,8 @@ public class Orchestrator {
                 .flatMap(Collection::stream)
                 .collect(toList());
 
-        suggester.setPreferredSummaries(preferredSummaries);
+
+        getActiveSuggester().setPreferredSummaries(preferredSummaries);
         List<Suggestion> suggestions =
                 suggestMethod.apply(keywords)
 //                suggester
@@ -218,8 +245,7 @@ public class Orchestrator {
                         .limit(LIMIT_SUGGESTIONS)
                         .collect(toList());
 
-
-        suggester.setPreferredSummaries(null);
+        getActiveSuggester().setPreferredSummaries(null);
         suggestionsConsumer.accept(suggestions);
         //       column.getHeader().setPropertySuggestions(suggestions);
 

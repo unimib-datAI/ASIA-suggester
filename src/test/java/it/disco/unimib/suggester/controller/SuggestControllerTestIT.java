@@ -106,6 +106,17 @@ public class SuggestControllerTestIT {
     }
 
     @Test
+    public void putTranslationColumnITALOV() {
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .body(columnITA)
+                        .param("suggester", SuggestController.TypeSuggester.LOV)
+                        .put("/suggester/api/column/translate");
+        response.getBody().prettyPrint();
+    }
+
+    @Test
     public void putTranslationColumnENG() {
         Response response =
                 given()

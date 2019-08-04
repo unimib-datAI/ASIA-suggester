@@ -21,7 +21,11 @@ public class ConfigProperties {
     @NotNull
     private Translator translator;
     @NotNull
-    private Summarizer summarizer;
+    private Summarizer abstat;
+
+    @NotNull
+    private Summarizer lov;
+
 
     @Data
     @AllArgsConstructor
