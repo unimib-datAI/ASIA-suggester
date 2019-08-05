@@ -70,7 +70,7 @@ public class SuggestControllerTestIT {
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
                 .body(tableSchemaITA)
-                .param("preferredSummaries[]", new String[]{"linkedgeodata", "dbpedia-2016-10"})
+                .param("preferredSummaries", "linkedgeodata", "dbpedia-2016-10")
                 .put("/suggester/api/schema/translate");
 
         response.getBody().prettyPrint();
@@ -86,7 +86,7 @@ public class SuggestControllerTestIT {
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
                 .body(tableSchemaENG)
-                .param("preferredSummaries[]", new String[]{"linkedgeodata", "dbpedia-2016-10"})
+                .param("preferredSummaries", "linkedgeodata", "dbpedia-2016-10")
                 .put("/suggester/api/schema/translate");
 
         response.getBody().prettyPrint();

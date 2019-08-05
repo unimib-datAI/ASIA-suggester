@@ -32,7 +32,7 @@ public class SuggestController {
 
     @PutMapping(value = "/schema/translate", consumes = "application/json", produces = "application/json")
     public TableSchema putTranslateSchema(@Valid @RequestBody TableSchema schema,
-                                          @RequestParam(name = "preferredSummaries[]", required = false) String[] preferredSummaries,
+                                          @RequestParam(name = "preferredSummaries", required = false) String[] preferredSummaries,
                                           @RequestParam(name = "suggester", required = false) String suggester) {
         if (test) {
             String summaries = String.join(",", asList(preferredSummaries));
@@ -40,7 +40,8 @@ public class SuggestController {
         }
 
         String suggesterName;
-        if (Objects.nonNull(suggester) & TypeSuggester.checkFromName(suggester)) suggesterName = suggester;
+        if (Objects.nonNull(suggester) &&
+                TypeSuggester.checkFromName(suggester)) suggesterName = suggester;
         else suggesterName = null;
 
         TableSchema tableSchema = preferredSummaries != null
@@ -52,11 +53,14 @@ public class SuggestController {
 
     @PutMapping(value = "column/translate", consumes = "application/json", produces = "application/json")
     public Column putTranslateColumn(@Valid @RequestBody Column column,
-                                     @RequestParam(name = "preferredSummaries[]", required = false) String[] preferredSummaries,
-                                     @RequestParam(name = "suggester", required = false) TypeSuggester suggester) {
+                                     @RequestParam(name = "preferredSummaries", required = false) String[] preferredSummaries,
+                                     @RequestParam(name = "suggester", required = false) String suggester) {
         if (test) System.out.println(column.toString());
 
-        String suggesterName = Objects.nonNull(suggester) ? suggester.getValue() : null;
+        String suggesterName;
+        if (Objects.nonNull(suggester) &&
+                TypeSuggester.checkFromName(suggester)) suggesterName = suggester;
+        else suggesterName = null;
 
         return preferredSummaries != null
                 ? orchestrator.translateAndSuggest(column, asList(preferredSummaries), suggesterName)
@@ -64,10 +68,15 @@ public class SuggestController {
     }
 
 
-    @GetMapping(value = "/summaries", produces = "application/json")
-    public List<String> getSummaries(@RequestParam(name = "suggester", required = false) TypeSuggester suggester) {
+    @GetMapping(value = "summaries", produces = "application/json")
+    public List<String> getSummaries(@RequestParam(name = "suggester", required = false) String suggester) {
 
-        return orchestrator.getAvailableSummaries(suggester.getValue());
+        String suggesterName;
+        if (Objects.nonNull(suggester) &&
+                TypeSuggester.checkFromName(suggester)) suggesterName = suggester;
+        else suggesterName = null;
+
+        return orchestrator.getAvailableSummaries(suggesterName);
     }
 
 
@@ -86,8 +95,9 @@ public class SuggestController {
         }
 
         public static boolean checkFromName(String x) {
-            for (TypeSuggester currentType : TypeSuggester.values())
-                if (x.equals(currentType.getValue())) return true;
+            if (Objects.nonNull(x))
+                for (TypeSuggester currentType : TypeSuggester.values())
+                    if (x.equals(currentType.getValue())) return true;
             return false;
         }
     }

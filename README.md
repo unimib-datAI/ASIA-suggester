@@ -5,11 +5,22 @@ This work is part of [EuBusinessGraph](https://www.eubusinessgraph.eu/) EU proje
 
 ## Build and Run
 
-**Requirements**: ASIA-MAS has been developed and tested using Java 1.8.  
+**Requirements and Prerequisites**: 
+- ASIA-MAS has been developed and tested using **Java 1.8**.  
+- An Azure subscription key for Translator Text (to get one follow this [tutorial](https://crunchify.com/microsoft-translator-text-api-example/))
 
 From root directory:
 ```
 $ cd suggester
 $ ./mvnw package
-$ java -jar target/AsiaBackend.jar
+$ java -jar target/suggester-0.1.jar --suggester.translator.subscription-key=XXXXXXXXXXXXXXX
+```
+
+The Azure subscription key can also be set as an environment variable:
+
+```
+(on Linux)
+$ SUGGESTER_TRANSLATOR_SUBSCRIPTION_KEY=XXXXX
+$ echo $SUGGESTER_TRANSLATOR_SUBSCRIPTION_KEY
+$ java -jar target/suggester-0.1.jar
 ```

@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -33,8 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SuppressWarnings("SpellCheckingInspection")
 @RunWith(SpringRunner.class)
 @WebMvcTest(SuggestController.class)
-//@AutoConfigureMockMvc
-//@AutoConfigureRestDocs(outputDir = "target/snippets")
+@AutoConfigureRestDocs(outputDir = "target/snippets")
 public class SuggestControllerTest {
 
 
@@ -83,14 +84,15 @@ public class SuggestControllerTest {
         String json = mapper.writeValueAsString(schema);
         mockMvc.perform(
                 put("/suggester/api/schema/translate")
-                        .param("preferredSummaries[]", "linkedgeodata", "dbpedia-2016-10")
+                        .param("preferredSummaries", "linkedgeodata", "dbpedia-2016-10")
                         .param("suggester", SuggestController.TypeSuggester.ABSTAT.getValue())
                         .content(json)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.content().json(this.json));
+                .andExpect(MockMvcResultMatchers.content().json(this.json))
+                .andDo(document("schema"));
 
 
     }
