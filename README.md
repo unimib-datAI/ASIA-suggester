@@ -39,3 +39,12 @@ $ ./mvnw clean package
 $ ./mvnw docker:build -Ddocker.account.name=<ACCOUNT_NAME>
 ```
 
+To run the just created Docker container:
+```
+$ docker run -e SUGGESTER_TRANSLATOR_SUBSCRIPTION_KEY=XXXX  <ACCOUNT_NAME>/asiasuggester
+```
+
+A precompiled Docker image of ASIA-MAS can be found at:
+````
+https://hub.docker.com/r/miciav/asiasuggester
+````
