@@ -130,7 +130,7 @@ public class LOVSuggester implements ISuggester {
         return null;*/
 // this does not work. I could not find the way to retrieve the actual vocabulary names
 
-        String fName = "vocabulary-list.txt";
+        String fName = "static/vocabulary-list.txt";
 
         try {
             File file = ResourceUtils.getFile("classpath:" + fName);
