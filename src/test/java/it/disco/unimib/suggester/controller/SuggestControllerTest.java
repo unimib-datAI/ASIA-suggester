@@ -18,8 +18,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.util.ResourceUtils;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -59,33 +63,31 @@ public class SuggestControllerTest {
         schema = new TableSchema();
         schema.addColumn(column);
 
+        String fName = "schema-translateITA.json";
 
-        json = "{\"columnList\":[{\"header\":{\"originalWord\":\"Casa_Giardino\",\"processedWord\":\"casa giardino\"," +
-                "\"splitTerms\":[\"casa\",\"giardino\"],\"translatedWord\":[" +
-                "{\"translatedWord\":\"HouseGarden\",\"confidence\":0.59565}, " +
-                "{\"translatedWord\":\"HomeGarden\",\"confidence\":0.58855}," +
-                "{\"translatedWord\":\"HouseGrounds\",\"confidence\":0.32585}, " +
-                "{\"translatedWord\":\"HomeGrounds\",\"confidence\":0.31875}," +
-                "{\"translatedWord\":\"HouseSurroundingGarden\",\"confidence\":0.30205}, " +
-                "{\"translatedWord\":\"HomeSurroundingGarden\",\"confidence\":0.29495}," +
-                "{\"translatedWord\":\"HouseYard\",\"confidence\":0.29065}, " +
-                "{\"translatedWord\":\"HomeYard\",\"confidence\":0.28355}]," +
-                "\"language\":\"IT\"},\"dataType\":null}]}";
+        File file = ResourceUtils.getFile("classpath:" + fName);
+        json = new String(Files.readAllBytes(Paths.get(file.getPath())));
+        System.out.println(json);
 
         TableSchema returnedSchema = mapper.readValue(json, TableSchema.class);
-        Mockito.when(orchestrator.translateTableSchema(Mockito.any(TableSchema.class)))
+        Mockito.when(orchestrator.translateAndSuggest(
+                Mockito.any(TableSchema.class),
+                Mockito.anyObject(),
+                Mockito.anyObject()))
                 .thenReturn(returnedSchema);
     }
 
     @Test
     public void putTranslation() throws Exception {
 
-
         String json = mapper.writeValueAsString(schema);
-        mockMvc.perform(put("/api/suggester/translate")
-                .content(json)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                put("/suggester/api/schema/translate")
+                        .param("preferredSummaries[]", "linkedgeodata", "dbpedia-2016-10")
+                        .param("suggester", SuggestController.TypeSuggester.ABSTAT.getValue())
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().json(this.json));

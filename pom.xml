@@ -10,7 +10,7 @@
     </parent>
     <groupId>it.disco.unimib</groupId>
     <artifactId>suggester</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1</version>
     <name>suggester</name>
     <description>Suggester service for ASIA</description>
 

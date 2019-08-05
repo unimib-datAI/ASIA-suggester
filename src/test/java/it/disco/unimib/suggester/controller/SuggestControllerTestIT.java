@@ -111,7 +111,7 @@ public class SuggestControllerTestIT {
                 given()
                         .contentType(ContentType.JSON)
                         .body(columnITA)
-                        .param("suggester", SuggestController.TypeSuggester.LOV)
+                        .param("suggester", SuggestController.TypeSuggester.LOV.getValue())
                         .put("/suggester/api/column/translate");
         response.getBody().prettyPrint();
     }

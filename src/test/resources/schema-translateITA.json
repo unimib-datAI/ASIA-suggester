@@ -1,0 +1,426 @@
+{
+  "columnList": [
+    {
+      "header": {
+        "originalWord": "CasaGiardino",
+        "processedWord": "casa giardino",
+        "splitTerms": [
+          "casa",
+          "giardino"
+        ],
+        "translatedPhrases": [
+          {
+            "translatedWord": [
+              "House Garden"
+            ],
+            "confidence": 0.59565,
+            "numOfWords": 2
+          },
+          {
+            "translatedWord": [
+              "Home Garden"
+            ],
+            "confidence": 0.58855,
+            "numOfWords": 2
+          }
+        ],
+        "translatedWords": [
+          {
+            "translatedWord": [
+              "garden"
+            ],
+            "confidence": 0.6842,
+            "numOfWords": 1
+          },
+          {
+            "translatedWord": [
+              "house"
+            ],
+            "confidence": 0.5071,
+            "numOfWords": 1
+          },
+          {
+            "translatedWord": [
+              "home"
+            ],
+            "confidence": 0.4929,
+            "numOfWords": 1
+          }
+        ],
+        "manipulatedTranslatedPhrases": [
+          {
+            "translatedWord": [
+              "HouseGarden",
+              "House_Garden",
+              "House%3AGarden",
+              "House%20Garden"
+            ],
+            "confidence": "NaN",
+            "numOfWords": 2
+          },
+          {
+            "translatedWord": [
+              "GardenHouse",
+              "Garden_House",
+              "Garden%3AHouse",
+              "Garden%20House"
+            ],
+            "confidence": "NaN",
+            "numOfWords": 2
+          },
+          {
+            "translatedWord": [
+              "HomeGarden",
+              "Home_Garden",
+              "Home%3AGarden",
+              "Home%20Garden"
+            ],
+            "confidence": "NaN",
+            "numOfWords": 2
+          },
+          {
+            "translatedWord": [
+              "GardenHome",
+              "Garden_Home",
+              "Garden%3AHome",
+              "Garden%20Home"
+            ],
+            "confidence": "NaN",
+            "numOfWords": 2
+          },
+          {
+            "translatedWord": [
+              "House"
+            ],
+            "confidence": "NaN",
+            "numOfWords": 1
+          },
+          {
+            "translatedWord": [
+              "Garden"
+            ],
+            "confidence": "NaN",
+            "numOfWords": 1
+          },
+          {
+            "translatedWord": [
+              "Home"
+            ],
+            "confidence": "NaN",
+            "numOfWords": 1
+          }
+        ],
+        "language": "IT",
+        "propertySuggestions": [
+          {
+            "prefix": "lgv",
+            "suggestion": "http://linkedgeodata.org/ontology/garden",
+            "namespace": "http://linkedgeodata.org/ontology/",
+            "entityName": "garden",
+            "occurrence": 21,
+            "dataset": "linkedgeodata",
+            "positionDataset": 0,
+            "searchedKeyword": "Garden",
+            "ratioIndex": 1.0,
+            "calculatedIndex": "NaN",
+            "suggesterScore": "NaN",
+            "distances": [
+              1.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "searchedKeywordLength": 6
+          },
+          {
+            "prefix": "lgv",
+            "suggestion": "http://linkedgeodata.org/ontology/house",
+            "namespace": "http://linkedgeodata.org/ontology/",
+            "entityName": "house",
+            "occurrence": 18,
+            "dataset": "linkedgeodata",
+            "positionDataset": 0,
+            "searchedKeyword": "House",
+            "ratioIndex": 1.0,
+            "calculatedIndex": "NaN",
+            "suggesterScore": "NaN",
+            "distances": [
+              1.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "searchedKeywordLength": 5
+          },
+          {
+            "prefix": "lgv",
+            "suggestion": "http://linkedgeodata.org/ontology/garden%3Atype",
+            "namespace": "http://linkedgeodata.org/ontology/",
+            "entityName": "garden%3Atype",
+            "occurrence": 15,
+            "dataset": "linkedgeodata",
+            "positionDataset": 0,
+            "searchedKeyword": "Garden%3AHome",
+            "ratioIndex": 1.0,
+            "calculatedIndex": "NaN",
+            "suggesterScore": "NaN",
+            "distances": [
+              1.049689440993789,
+              0.5000000000000001,
+              3.0,
+              3.0,
+              6.0
+            ],
+            "searchedKeywordLength": 13
+          },
+          {
+            "prefix": "lgv",
+            "suggestion": "http://linkedgeodata.org/ontology/garden%3Astyle",
+            "namespace": "http://linkedgeodata.org/ontology/",
+            "entityName": "garden%3Astyle",
+            "occurrence": 2,
+            "dataset": "linkedgeodata",
+            "positionDataset": 0,
+            "searchedKeyword": "Garden%3AHouse",
+            "ratioIndex": 1.0,
+            "calculatedIndex": "NaN",
+            "suggesterScore": "NaN",
+            "distances": [
+              1.053763440860215,
+              0.5000000000000001,
+              4.0,
+              4.0,
+              6.0
+            ],
+            "searchedKeywordLength": 14
+          },
+          {
+            "prefix": "lgv",
+            "suggestion": "http://linkedgeodata.org/ontology/garden_type",
+            "namespace": "http://linkedgeodata.org/ontology/",
+            "entityName": "garden_type",
+            "occurrence": 1,
+            "dataset": "linkedgeodata",
+            "positionDataset": 0,
+            "searchedKeyword": "Garden",
+            "ratioIndex": 0.5454545454545454,
+            "calculatedIndex": "NaN",
+            "suggesterScore": "NaN",
+            "distances": [
+              1.0739644970414202,
+              1.0,
+              0.0,
+              5.0,
+              5.0
+            ],
+            "searchedKeywordLength": 6
+          },
+          {
+            "prefix": "lgv",
+            "suggestion": "http://linkedgeodata.org/ontology/garden_waste",
+            "namespace": "http://linkedgeodata.org/ontology/",
+            "entityName": "garden_waste",
+            "occurrence": 1,
+            "dataset": "linkedgeodata",
+            "positionDataset": 0,
+            "searchedKeyword": "Garden",
+            "ratioIndex": 0.5,
+            "calculatedIndex": "NaN",
+            "suggesterScore": "NaN",
+            "distances": [
+              1.0909090909090908,
+              1.0,
+              0.0,
+              6.0,
+              6.0
+            ],
+            "searchedKeywordLength": 6
+          },
+          {
+            "prefix": "lgv",
+            "suggestion": "http://linkedgeodata.org/ontology/garden_centre",
+            "namespace": "http://linkedgeodata.org/ontology/",
+            "entityName": "garden_centre",
+            "occurrence": 1,
+            "dataset": "linkedgeodata",
+            "positionDataset": 0,
+            "searchedKeyword": "Garden",
+            "ratioIndex": 0.46153846153846156,
+            "calculatedIndex": "NaN",
+            "suggesterScore": "NaN",
+            "distances": [
+              1.1069868995633187,
+              1.0,
+              0.0,
+              7.0,
+              7.0
+            ],
+            "searchedKeywordLength": 6
+          },
+          {
+            "prefix": "lgv",
+            "suggestion": "http://linkedgeodata.org/ontology/homepage",
+            "namespace": "http://linkedgeodata.org/ontology/",
+            "entityName": "homepage",
+            "occurrence": 9,
+            "dataset": "linkedgeodata",
+            "positionDataset": 0,
+            "searchedKeyword": "Home",
+            "ratioIndex": 0.5,
+            "calculatedIndex": "NaN",
+            "suggesterScore": "NaN",
+            "distances": [
+              1.1111111111111112,
+              1.0,
+              0.0,
+              4.0,
+              4.0
+            ],
+            "searchedKeywordLength": 4
+          },
+          {
+            "prefix": "lgv",
+            "suggestion": "http://linkedgeodata.org/ontology/home_visit",
+            "namespace": "http://linkedgeodata.org/ontology/",
+            "entityName": "home_visit",
+            "occurrence": 2,
+            "dataset": "linkedgeodata",
+            "positionDataset": 0,
+            "searchedKeyword": "Home",
+            "ratioIndex": 0.4,
+            "calculatedIndex": "NaN",
+            "suggesterScore": "NaN",
+            "distances": [
+              1.1363636363636365,
+              1.0,
+              0.0,
+              6.0,
+              6.0
+            ],
+            "searchedKeywordLength": 4
+          },
+          {
+            "prefix": "lgv",
+            "suggestion": "http://linkedgeodata.org/ontology/recycling:garden_waste",
+            "namespace": "http://linkedgeodata.org/ontology/",
+            "entityName": ":garden_waste",
+            "occurrence": 49,
+            "dataset": "linkedgeodata",
+            "positionDataset": 0,
+            "searchedKeyword": "Garden",
+            "ratioIndex": 0.46153846153846156,
+            "calculatedIndex": "NaN",
+            "suggesterScore": "NaN",
+            "distances": [
+              1.2187499999999998,
+              1.0,
+              0.0,
+              7.0,
+              7.0
+            ],
+            "searchedKeywordLength": 6
+          }
+        ],
+        "objectSuggestions": [
+          {
+            "prefix": "dbo",
+            "suggestion": "http://dbpedia.org/ontology/Garden",
+            "namespace": "http://dbpedia.org/ontology/",
+            "entityName": "Garden",
+            "occurrence": 358,
+            "dataset": "dbpedia-2016-10",
+            "positionDataset": 1,
+            "searchedKeyword": "Garden",
+            "ratioIndex": 1.0,
+            "calculatedIndex": "NaN",
+            "suggesterScore": "NaN",
+            "distances": [
+              1.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "searchedKeywordLength": 6
+          },
+          {
+            "prefix": "dbo",
+            "suggestion": "http://dbpedia.org/ontology/Lighthouse",
+            "namespace": "http://dbpedia.org/ontology/",
+            "entityName": "Lighthouse",
+            "occurrence": 2132,
+            "dataset": "dbpedia-2016-10",
+            "positionDataset": 1,
+            "searchedKeyword": "House%3AGarden",
+            "ratioIndex": 0.7142857142857143,
+            "calculatedIndex": "NaN",
+            "suggesterScore": "NaN",
+            "distances": [
+              1.9626168224299068,
+              1.0,
+              0.0,
+              13.0,
+              14.0
+            ],
+            "searchedKeywordLength": 14
+          }
+        ],
+        "subjectSuggestions": [
+          {
+            "prefix": "dbo",
+            "suggestion": "http://dbpedia.org/ontology/Garden",
+            "namespace": "http://dbpedia.org/ontology/",
+            "entityName": "Garden",
+            "occurrence": 358,
+            "dataset": "dbpedia-2016-10",
+            "positionDataset": 1,
+            "searchedKeyword": "Garden",
+            "ratioIndex": 1.0,
+            "calculatedIndex": "NaN",
+            "suggesterScore": "NaN",
+            "distances": [
+              1.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "searchedKeywordLength": 6
+          },
+          {
+            "prefix": "dbo",
+            "suggestion": "http://dbpedia.org/ontology/Lighthouse",
+            "namespace": "http://dbpedia.org/ontology/",
+            "entityName": "Lighthouse",
+            "occurrence": 2132,
+            "dataset": "dbpedia-2016-10",
+            "positionDataset": 1,
+            "searchedKeyword": "House%3AGarden",
+            "ratioIndex": 0.7142857142857143,
+            "calculatedIndex": "NaN",
+            "suggesterScore": "NaN",
+            "distances": [
+              1.9626168224299068,
+              1.0,
+              0.0,
+              13.0,
+              14.0
+            ],
+            "searchedKeywordLength": 14
+          }
+        ]
+      },
+      "dataType": null
+    }
+  ],
+  "forceSingleLanguage": true,
+  "languageWithStatsList": [
+    {
+      "languageType": "IT",
+      "frequency": 1.0
+    }
+  ],
+  "language": "IT"
+}

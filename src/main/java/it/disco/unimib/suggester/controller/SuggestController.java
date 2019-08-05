@@ -33,17 +33,20 @@ public class SuggestController {
     @PutMapping(value = "/schema/translate", consumes = "application/json", produces = "application/json")
     public TableSchema putTranslateSchema(@Valid @RequestBody TableSchema schema,
                                           @RequestParam(name = "preferredSummaries[]", required = false) String[] preferredSummaries,
-                                          @RequestParam(name = "suggester", required = false) TypeSuggester suggester) {
+                                          @RequestParam(name = "suggester", required = false) String suggester) {
         if (test) {
             String summaries = String.join(",", asList(preferredSummaries));
             System.out.println(summaries);
         }
 
-        String suggesterName = Objects.nonNull(suggester) ? suggester.getValue() : null;
+        String suggesterName;
+        if (Objects.nonNull(suggester) & TypeSuggester.checkFromName(suggester)) suggesterName = suggester;
+        else suggesterName = null;
 
-        return preferredSummaries != null
+        TableSchema tableSchema = preferredSummaries != null
                 ? orchestrator.translateAndSuggest(schema, asList(preferredSummaries), suggesterName)
                 : orchestrator.translateAndSuggest(schema, emptyList(), suggesterName);
+        return tableSchema;
     }
 
 
@@ -80,6 +83,12 @@ public class SuggestController {
 
         String getValue() {
             return value;
+        }
+
+        public static boolean checkFromName(String x) {
+            for (TypeSuggester currentType : TypeSuggester.values())
+                if (x.equals(currentType.getValue())) return true;
+            return false;
         }
     }
 

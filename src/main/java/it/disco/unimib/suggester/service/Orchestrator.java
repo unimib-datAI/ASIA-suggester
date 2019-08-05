@@ -101,7 +101,7 @@ public class Orchestrator {
         return "abstat".equalsIgnoreCase(activeSuggester) ? suggesterABSTAT : suggesterLOV;
     }
 
-    public TableSchema translateTableSchema(TableSchema schema) {
+    TableSchema translateTableSchema(TableSchema schema) {
         return setTranslatedWords(
                 setSplitTerms(
                         detectLanguagesForTableSchema(

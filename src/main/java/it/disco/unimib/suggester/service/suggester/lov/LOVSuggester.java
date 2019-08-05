@@ -112,7 +112,7 @@ public class LOVSuggester implements ISuggester {
 
     @Override
     public List<String> getSummaries() {
-/*        String url = "https://lov.linkeddata.es/dataset/lov/api/v2/vocabulary/list"; // TODO: 2019-08-04 fix this
+/*        String url = "https://lov.linkeddata.es/dataset/lov/api/v2/vocabulary/list";
         HttpUrl.Builder urlBuilder = requireNonNull(HttpUrl.parse(url)).newBuilder();
         try {
             String datasets = suggesterUtils.performGETRequest(urlBuilder);
@@ -146,7 +146,6 @@ public class LOVSuggester implements ISuggester {
     private String getLOVSuggestions(@NonNull String keyword, @NonNull TypeLOV typeLOV, String summary) {
 
         String url = properties.getLov().getFullSuggestEndpoint();
-        //"https://lov.linkeddata.es/dataset/lov/api/v2/term/search";
 
         HttpUrl.Builder urlBuilder = requireNonNull(HttpUrl.parse(url)).newBuilder();
         if (!StringUtils.isEmpty(keyword)) {
