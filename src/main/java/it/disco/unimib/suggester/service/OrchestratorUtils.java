@@ -142,13 +142,22 @@ public class OrchestratorUtils {
 
     static void generateAndSetPhrasesCombinatorially(Header header) {
 
+        double max = header
+                .getTranslatedPhrases()
+                .stream()
+                .mapToDouble(TranslatedWord::getConfidence)
+                .max().getAsDouble();
+        double threshold = max - ((max / 3) * 100);
+
         List<Pair<List<String>, Integer>> collect = header
                 .getTranslatedPhrases()
                 .stream()
+                .filter(translatedWord -> translatedWord.getConfidence() > threshold)
                 .map(OrchestratorUtils::generatePhrasesCombinatoriallyFromTranslatedWord)
                 .flatMap(Collection::stream)
                 .distinct()
                 .map(w -> Pair.of(w, w.size()))
+                .limit(20)
                 .collect(toList());
 
 

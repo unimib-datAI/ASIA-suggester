@@ -43,7 +43,9 @@ public class SuggestControllerTestIT {
         baseURI = "http://localhost"; // replace as appropriate
 
         Header headerITA = new Header();
-        headerITA.setOriginalWord("CasaGiardino");
+        //headerITA.setOriginalWord("CasaGiardino");
+
+        headerITA.setOriginalWord("baseIndirizzoCompleto");
         columnITA = new Column();
         columnITA.setHeader(headerITA);
         tableSchemaITA = new TableSchema();
@@ -61,7 +63,7 @@ public class SuggestControllerTestIT {
 
     }
 
-    @Test
+/*    @Test
     public void putTranslationColumnNor() {
         Header headerNor = new Header();
         headerNor.setOriginalWord("antallAnsatte");
@@ -77,10 +79,10 @@ public class SuggestControllerTestIT {
                         .put("/suggester/api/column/translate");
         response.getBody().prettyPrint();
 
-    }
+    }*/
 
 
-    /*@Test
+ /*   @Test
     public void putTranslationTableSchemaITA() {
 
         Response response = given()
@@ -110,7 +112,7 @@ public class SuggestControllerTestIT {
 
         response.then().body("columnList[0].header.language", equalTo(LanguageType.EN.toString()));
 
-    }
+    }*/
 
     @Test
     public void putTranslationColumnITA() {
@@ -122,7 +124,7 @@ public class SuggestControllerTestIT {
         response.getBody().prettyPrint();
     }
 
-    @Test
+   /* @Test
     public void putTranslationColumnITALOV() {
         Response response =
                 given()
