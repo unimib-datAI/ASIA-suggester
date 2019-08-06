@@ -18,11 +18,9 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -50,18 +48,13 @@ public class LOVSuggester implements ISuggester {
         this.suggesterUtils = suggesterUtils;
     }
 
-    private static List<String> fileStreamUsingBufferedReader(File file) {
-        try {
+    private static List<String> fileStreamUsingBufferedReader(InputStream file) {
 
-            BufferedReader br = Files.newBufferedReader(Paths.get(file.getPath()));
-            Stream<String> lines = br.lines();
-            List<String> collect = lines.map(l -> l.split("\\s")[0]).collect(toList());
-            lines.close();
-            return collect;
-        } catch (IOException io) {
-            io.printStackTrace();
-        }
-        return null;
+        BufferedReader br = new BufferedReader(new InputStreamReader(file));
+        Stream<String> lines = br.lines();
+        List<String> collect = lines.map(l -> l.split("\\s")[0]).collect(toList());
+        lines.close();
+        return collect;
     }
 
     @Override
@@ -133,9 +126,9 @@ public class LOVSuggester implements ISuggester {
         String fName = "static/vocabulary-list.txt";
 
         try {
-            File file = ResourceUtils.getFile("classpath:" + fName);
-            return new ArrayList<>(requireNonNull(fileStreamUsingBufferedReader(file)));
-        } catch (FileNotFoundException e) {
+            InputStream fileStream = ResourceUtils.getURL("classpath:" + fName).openStream(); //.getFile("classpath:" + fName);
+            return new ArrayList<>(requireNonNull(fileStreamUsingBufferedReader(fileStream)));
+        } catch (IOException e) {
             e.printStackTrace();
             return Collections.emptyList();
         }

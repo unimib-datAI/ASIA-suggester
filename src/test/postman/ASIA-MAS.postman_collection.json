@@ -1,0 +1,63 @@
+{
+  "info": {
+    "_postman_id": "8060b2e9-0881-487c-baba-2450b28ddd47",
+    "name": "ASIA-MAS",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "getSummaries-ABSTAT",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8085/suggester/api/summaries?suggester=abstat",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8085",
+          "path": [
+            "suggester",
+            "api",
+            "summaries"
+          ],
+          "query": [
+            {
+              "key": "suggester",
+              "value": "abstat"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "getSummaries-LOV",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8085/suggester/api/summaries?suggester=lov",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8085",
+          "path": [
+            "suggester",
+            "api",
+            "summaries"
+          ],
+          "query": [
+            {
+              "key": "suggester",
+              "value": "lov"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

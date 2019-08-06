@@ -130,6 +130,10 @@ public class SuggestControllerTestIT {
     @Test
     public void getSummaries() {
         given().contentType(ContentType.JSON).get("/suggester/api/summaries").getBody().prettyPrint();
+        given().contentType(ContentType.JSON)
+                .param("suggester", "lov")
+                .get("/suggester/api/summaries")
+                .getBody().prettyPrint();
     }
 
 }
