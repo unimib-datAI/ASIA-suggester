@@ -9,6 +9,7 @@ public enum LanguageType {
     DE("de"),
     ES("es"),
     SI("si"),
+    NB("nb"),
     UNKNOWN("unknown");
 
 

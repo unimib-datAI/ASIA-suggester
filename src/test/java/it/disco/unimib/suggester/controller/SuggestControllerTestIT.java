@@ -18,7 +18,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
 
 
 @SuppressWarnings("SpellCheckingInspection")
@@ -62,8 +61,26 @@ public class SuggestControllerTestIT {
 
     }
 
-
     @Test
+    public void putTranslationColumnNor() {
+        Header headerNor = new Header();
+        headerNor.setOriginalWord("antallAnsatte");
+        Column columnNor = new Column();
+        columnNor.setHeader(headerNor);
+        TableSchema tableSchemaNor = new TableSchema();
+        tableSchemaNor.addColumn(columnNor);
+
+        Response response =
+                given()
+                        .contentType(ContentType.JSON)
+                        .body(columnNor)
+                        .put("/suggester/api/column/translate");
+        response.getBody().prettyPrint();
+
+    }
+
+
+    /*@Test
     public void putTranslationTableSchemaITA() {
 
         Response response = given()
@@ -134,6 +151,6 @@ public class SuggestControllerTestIT {
                 .param("suggester", "lov")
                 .get("/suggester/api/summaries")
                 .getBody().prettyPrint();
-    }
+    }*/
 
 }
