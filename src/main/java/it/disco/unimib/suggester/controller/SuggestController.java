@@ -90,8 +90,8 @@ public class SuggestController {
 
 
     @GetMapping(value = "languages")
-    public List<String> getLanguages() {
-        return Arrays.stream(LanguageType.values()).map(LanguageType::getLanguage).collect(toList());
+    public LanguageType[] getLanguages() {
+        return LanguageType.values();
     }
 
 
