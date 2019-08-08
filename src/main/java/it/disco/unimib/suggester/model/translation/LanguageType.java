@@ -28,6 +28,7 @@ public enum LanguageType {
         return LanguageType.UNKNOWN;
     }
 
+
     public static boolean checkSupportedLanguage(LanguageType type) {
         if (type == null) return false;
         return Arrays.asList(LanguageType.values()).contains(type);
@@ -41,7 +42,7 @@ public enum LanguageType {
 
     }
 
-    private String getLanguage() {
+    public String getLanguage() {
         return language;
     }
 

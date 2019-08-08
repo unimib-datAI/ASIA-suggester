@@ -3,17 +3,20 @@ package it.disco.unimib.suggester.controller;
 
 import it.disco.unimib.suggester.model.table.Column;
 import it.disco.unimib.suggester.model.table.TableSchema;
+import it.disco.unimib.suggester.model.translation.LanguageType;
 import it.disco.unimib.suggester.service.Orchestrator;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 
 @RestController
 @CrossOrigin("*")
@@ -78,6 +81,17 @@ public class SuggestController {
         else suggesterName = null;
 
         return orchestrator.getAvailableSummaries(suggesterName);
+    }
+
+    @GetMapping(value = "suggesters")
+    public List<String> getSuggesters() {
+        return Arrays.stream(TypeSuggester.values()).map(TypeSuggester::getValue).collect(toList());
+    }
+
+
+    @GetMapping(value = "languages")
+    public List<String> getLanguages() {
+        return Arrays.stream(LanguageType.values()).map(LanguageType::getLanguage).collect(toList());
     }
 
 
