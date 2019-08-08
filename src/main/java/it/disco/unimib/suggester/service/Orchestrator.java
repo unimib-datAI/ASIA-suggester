@@ -146,7 +146,7 @@ public class Orchestrator {
 
     private Column detectLanguageForColumn(Column column) {
         Header header = column.getHeader();
-        if (!checkSupportedLanguage(header.getLanguage()))
+        if (!checkSupportedLanguage(header.getLanguage()) || header.getLanguage() == UNKNOWN)
             header.setLanguage(translator.detect(singletonList(header.getProcessedWord())).get(0).getLanguageEnum());
         return column;
     }
