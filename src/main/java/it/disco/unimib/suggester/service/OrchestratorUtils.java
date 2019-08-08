@@ -146,7 +146,7 @@ public class OrchestratorUtils {
                 .getTranslatedPhrases()
                 .stream()
                 .mapToDouble(TranslatedWord::getConfidence)
-                .max().getAsDouble();
+                .max().orElse(.0);
         double threshold = max - ((max / 3) * 100);
 
         List<Pair<List<String>, Integer>> collect = header
