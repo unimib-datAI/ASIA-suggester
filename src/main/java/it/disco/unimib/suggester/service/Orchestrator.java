@@ -10,6 +10,7 @@ import it.disco.unimib.suggester.model.translation.IDetectedLanguage;
 import it.disco.unimib.suggester.model.translation.ILookedupTerm;
 import it.disco.unimib.suggester.model.translation.LanguageType;
 import it.disco.unimib.suggester.service.suggester.ISuggester;
+import it.disco.unimib.suggester.service.suggester.abstat.ABSTATSuggester;
 import it.disco.unimib.suggester.service.translator.ITranslator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -25,6 +26,7 @@ import java.util.function.Function;
 
 import static it.disco.unimib.suggester.model.translation.LanguageType.*;
 import static it.disco.unimib.suggester.service.OrchestratorUtils.*;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.reverseOrder;
@@ -91,6 +93,20 @@ public class Orchestrator {
         suggestObjects(schema, preferredSummaries);
         this.activeSuggester = "abstat";
         return schema;
+    }
+
+    public List<Suggestion> abstatAutocomplete(String keyword, ABSTATSuggester.Position position, List<String> preferredSummaries) {
+        this.suggesterABSTAT.setPreferredSummaries(preferredSummaries);
+        switch (position) {
+            case SUBJ:
+                return suggesterABSTAT.typeSuggestions(keyword);
+            case OBJ:
+                return suggesterABSTAT.objectSuggestions(keyword);
+            case PRED:
+                return suggesterABSTAT.propertySuggestions(keyword);
+            default:
+                return emptyList();
+        }
     }
 
     private List<String> getAvailableSummaries() {

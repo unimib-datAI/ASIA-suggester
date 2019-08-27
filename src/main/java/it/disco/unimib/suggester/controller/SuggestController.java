@@ -1,10 +1,12 @@
 package it.disco.unimib.suggester.controller;
 
 
+import it.disco.unimib.suggester.model.suggestion.Suggestion;
 import it.disco.unimib.suggester.model.table.Column;
 import it.disco.unimib.suggester.model.table.TableSchema;
 import it.disco.unimib.suggester.model.translation.LanguageType;
 import it.disco.unimib.suggester.service.Orchestrator;
+import it.disco.unimib.suggester.service.suggester.abstat.ABSTATSuggester.Position;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.bind.annotation.*;
@@ -71,6 +73,14 @@ public class SuggestController {
                 : orchestrator.translateAndSuggest(column, emptyList(), suggesterName);
     }
 
+    @GetMapping(value = "autocomplete/en", produces = "application/json")
+    public List<Suggestion> autocomplete(@RequestParam(name = "keyword") String keyword,
+                                         @RequestParam(name = "position") String position,
+                                         @RequestParam(name = "preferredSummaries", required = false) String[] preferredSummaries) {
+        return preferredSummaries != null
+                ? orchestrator.abstatAutocomplete(keyword, Position.valueOf(position), asList(preferredSummaries))
+                : orchestrator.abstatAutocomplete(keyword, Position.valueOf(position), emptyList());
+    }
 
     @GetMapping(value = "summaries", produces = "application/json")
     public List<String> getSummaries(@RequestParam(name = "suggester", required = false) String suggester) {

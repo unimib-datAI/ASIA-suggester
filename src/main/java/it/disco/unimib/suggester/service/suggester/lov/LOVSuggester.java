@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import okhttp3.Headers;
 import okhttp3.HttpUrl;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -147,7 +148,7 @@ public class LOVSuggester implements ISuggester {
             if (!StringUtils.isEmpty(summary)) // check nullity and emptiness
                 urlBuilder.addQueryParameter("vocab", summary);
             try {
-                return suggesterUtils.performGETRequest(urlBuilder);
+                return suggesterUtils.performGETRequest(urlBuilder, new Headers.Builder());
             } catch (IOException e) {
                 e.printStackTrace();
                 return "";

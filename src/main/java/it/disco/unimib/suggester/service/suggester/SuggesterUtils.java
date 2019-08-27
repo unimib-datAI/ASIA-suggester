@@ -6,12 +6,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import it.disco.unimib.suggester.configuration.SuggesterConfiguration;
 import it.disco.unimib.suggester.model.suggestion.Suggestion;
-import okhttp3.HttpUrl;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.*;
 import org.springframework.stereotype.Component;
 
+import javax.xml.ws.http.HTTPException;
 import java.io.IOException;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -92,11 +90,22 @@ public class SuggesterUtils {
         return suggestion;
     }
 
-    public String performGETRequest(HttpUrl.Builder urlBuilder) throws IOException {
+    public String performGETRequest(HttpUrl.Builder urlBuilder, Headers.Builder headersBuilder) throws IOException, HTTPException {
         String url = urlBuilder.build().toString();
-        Request request = new Request.Builder().url(url).get().build();
+        Request request = new Request.Builder().url(url).get().headers(headersBuilder.build()).build();
         Response response = client.newCall(request).execute();
+        if (response.code() == 401) throw new HTTPException(401);
         assert response.body() != null;
         return response.body().string();
     }
+
+    public String performPOSTRequest(HttpUrl.Builder urlBuilder, Headers.Builder headersBuilder, RequestBody requestBody) throws IOException, HTTPException {
+        String url = urlBuilder.build().toString();
+        Request request = new Request.Builder().url(url).headers(headersBuilder.build()).post(requestBody).build();
+        Response response = client.newCall(request).execute();
+        if (response.code() == 401) throw new HTTPException(401);
+        assert response.body() != null;
+        return response.body().string();
+    }
+
 }

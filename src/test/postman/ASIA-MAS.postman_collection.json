@@ -1,63 +1,216 @@
 {
-  "info": {
-    "_postman_id": "8060b2e9-0881-487c-baba-2450b28ddd47",
-    "name": "ASIA-MAS",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-  },
-  "item": [
-    {
-      "name": "getSummaries-ABSTAT",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:8085/suggester/api/summaries?suggester=abstat",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8085",
-          "path": [
-            "suggester",
-            "api",
-            "summaries"
-          ],
-          "query": [
-            {
-              "key": "suggester",
-              "value": "abstat"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "getSummaries-LOV",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:8085/suggester/api/summaries?suggester=lov",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8085",
-          "path": [
-            "suggester",
-            "api",
-            "summaries"
-          ],
-          "query": [
-            {
-              "key": "suggester",
-              "value": "lov"
-            }
-          ]
-        }
-      },
-      "response": []
-    }
-  ]
+	"info": {
+		"_postman_id": "8403c7c7-6ed7-4cb7-b587-e7d10a4364c2",
+		"name": "ASIA-MAS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "getSummaries-ABSTAT",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://{{asia-mas}}/suggester/api/summaries?suggester=abstat",
+					"protocol": "http",
+					"host": [
+						"{{asia-mas}}"
+					],
+					"path": [
+						"suggester",
+						"api",
+						"summaries"
+					],
+					"query": [
+						{
+							"key": "suggester",
+							"value": "abstat"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getSummaries-LOV",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://{{asia-mas}}/suggester/api/summaries?suggester=lov",
+					"protocol": "http",
+					"host": [
+						"{{asia-mas}}"
+					],
+					"path": [
+						"suggester",
+						"api",
+						"summaries"
+					],
+					"query": [
+						{
+							"key": "suggester",
+							"value": "lov"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "columnTranslate-ABSTAT",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"header\": {\n        \"originalWord\": \"baseIndirizzoCompleto\",\n        \"processedWord\": null,\n        \"subjectSuggestions\": null,\n        \"language\": \"UNKNOWN\",\n        \"manipulatedTranslatedPhrases\": null,\n        \"objectSuggestions\": null,\n        \"propertySuggestions\": null,\n        \"splitTerms\": null,\n        \"translatedPhrases\": null,\n        \"translatedWords\": null\n    },\n    \"dataType\": null\n}"
+				},
+				"url": {
+					"raw": "http://{{asia-mas}}/suggester/api/column/translate?suggester=abstat&preferredSummaries=dbpedia-2015-10,linkedgeodata",
+					"protocol": "http",
+					"host": [
+						"{{asia-mas}}"
+					],
+					"path": [
+						"suggester",
+						"api",
+						"column",
+						"translate"
+					],
+					"query": [
+						{
+							"key": "suggester",
+							"value": "abstat"
+						},
+						{
+							"key": "preferredSummaries",
+							"value": "dbpedia-2015-10,linkedgeodata"
+						},
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "languages",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://{{asia-mas}}/suggester/api/languages",
+					"protocol": "http",
+					"host": [
+						"{{asia-mas}}"
+					],
+					"path": [
+						"suggester",
+						"api",
+						"languages"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "suggesters",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://{{asia-mas}}/suggester/api/suggesters",
+					"protocol": "http",
+					"host": [
+						"{{asia-mas}}"
+					],
+					"path": [
+						"suggester",
+						"api",
+						"suggesters"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Autocomplete",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://{{asia-mas}}/suggester/api/autocomplete/en?keyword=name&position=PRED",
+					"protocol": "http",
+					"host": [
+						"{{asia-mas}}"
+					],
+					"path": [
+						"suggester",
+						"api",
+						"autocomplete",
+						"en"
+					],
+					"query": [
+						{
+							"key": "keyword",
+							"value": "name"
+						},
+						{
+							"key": "position",
+							"value": "PRED"
+						},
+						{
+							"key": "preferredSummaries",
+							"value": "dbpedia-2015-10,linkedgeodata",
+							"disabled": true
+						},
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
 }

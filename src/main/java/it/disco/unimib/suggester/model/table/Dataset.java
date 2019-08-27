@@ -12,14 +12,9 @@ import java.net.URL;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Dataset {
-    private String URI = "";
-
-    public String getDatasetName() {
-        try {
-            return new File(new URL(URI).getPath()).getName();
-        } catch (MalformedURLException e) {
-            return "";
-        }
-    }
-
+    private String id;
+    private String name;
+    private String timestamp;
+    private String server;
+    private long numberOfTriples;
 }

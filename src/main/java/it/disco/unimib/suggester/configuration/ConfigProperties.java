@@ -39,12 +39,22 @@ public class ConfigProperties {
         @NotNull
         private String datasetsEndpoint;
 
+        private String authEndpoint;
+        private String authUsername;
+        private String authPassword;
+        private String username;
+        private String password;
+
         public String getFullSuggestEndpoint() {
             return mainEndpoint + "/" + suggestEndpoint;
         }
 
         public String getFullDatasetsEndpoint() {
             return mainEndpoint + "/" + datasetsEndpoint;
+        }
+
+        public String getAuthEndpoint() {
+            return mainEndpoint + "/" + authEndpoint;
         }
     }
 

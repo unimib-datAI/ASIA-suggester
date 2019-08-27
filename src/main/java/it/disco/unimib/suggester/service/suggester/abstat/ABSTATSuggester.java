@@ -6,15 +6,17 @@ import it.disco.unimib.suggester.configuration.SuggesterConfiguration;
 import it.disco.unimib.suggester.model.suggestion.Suggestion;
 import it.disco.unimib.suggester.service.suggester.ISuggester;
 import it.disco.unimib.suggester.service.suggester.SuggesterUtils;
+import it.disco.unimib.suggester.service.suggester.abstat.domain.Authentication;
 import it.disco.unimib.suggester.service.suggester.abstat.domain.Datasets;
 import it.disco.unimib.suggester.service.suggester.abstat.domain.Suggestions;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import okhttp3.HttpUrl;
+import okhttp3.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.xml.ws.http.HTTPException;
 import java.io.IOException;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -38,6 +40,8 @@ public class ABSTATSuggester implements ISuggester {
     private final ConfigProperties properties;
 
     private final SuggesterUtils suggesterUtils;
+
+    private String authToken = null;
 
     public ABSTATSuggester(ConfigProperties properties,
                            SuggesterConfiguration.DistanceCalculator distanceCalculator,
@@ -114,7 +118,7 @@ public class ABSTATSuggester implements ISuggester {
 
             if (!isEmpty(preferredSummaries)) // check nullity and emptiness
                 urlBuilder.addQueryParameter("dataset", String.join(",", preferredSummaries));
-            return suggesterUtils.performGETRequest(urlBuilder);
+            return performAuthenticatedRequest(urlBuilder);
 
         }
         return "";
@@ -145,12 +149,46 @@ public class ABSTATSuggester implements ISuggester {
     private Datasets summaries() throws IOException {
         String url = properties.getAbstat().getFullDatasetsEndpoint();
         HttpUrl.Builder urlBuilder = requireNonNull(HttpUrl.parse(url)).newBuilder();
-        String strDatasets = suggesterUtils.performGETRequest(urlBuilder);
+        String strDatasets = performAuthenticatedRequest(urlBuilder);
         if (test) System.out.println(SuggesterUtils.prettify(strDatasets));
         return gson.fromJson(strDatasets, Datasets.class);
 
     }
 
+    private String performAuthenticatedRequest(HttpUrl.Builder urlBuilder) throws IOException {
+        if (authToken == null) {
+            authenticate();
+        }
+
+        try {
+            return suggesterUtils.performGETRequest(urlBuilder, new Headers.Builder().add("Authorization",
+                    "Bearer " + authToken));
+        } catch (HTTPException e) {
+            if (e.getStatusCode() == 401) {
+                authenticate();
+                return suggesterUtils.performGETRequest(urlBuilder, new Headers.Builder().add("Authorization",
+                        "Bearer " + authToken));
+            }
+            throw e;
+        }
+    }
+
+    private void authenticate() throws IOException {
+        String url = properties.getAbstat().getAuthEndpoint();
+        HttpUrl.Builder urlBuilder = requireNonNull(HttpUrl.parse(url)).newBuilder();
+        String credentials = Credentials.basic(properties.getAbstat().getAuthUsername(),
+                properties.getAbstat().getAuthPassword());
+        RequestBody requestBody = new FormBody.Builder()
+                .add("grant_type", "password")
+                .add("username", properties.getAbstat().getUsername())
+                .add("password", properties.getAbstat().getPassword())
+                .build();
+        String strAuth = suggesterUtils.performPOSTRequest(
+                urlBuilder,
+                new Headers.Builder().add("Authorization", credentials),
+                requestBody);
+        this.authToken =  gson.fromJson(strAuth, Authentication.class).getAccess_token();
+    }
 
     private List<List<Suggestion>> listSuggestionsMultipleKeywords(@NonNull List<String> keywords, @NonNull Position position) {
         return keywords.stream()
@@ -158,7 +196,7 @@ public class ABSTATSuggester implements ISuggester {
                 .collect(toList());
     }
 
-    enum Position {
+    public enum Position {
         PRED("pred"), SUBJ("subj"), OBJ("obj");
         private final String value;
 
@@ -166,7 +204,7 @@ public class ABSTATSuggester implements ISuggester {
             this.value = value;
         }
 
-        String getValue() {
+        public String getValue() {
             return value;
         }
     }

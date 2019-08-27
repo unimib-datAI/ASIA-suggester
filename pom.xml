@@ -18,6 +18,7 @@
         <java.version>1.8</java.version>
         <spring-cloud.version>Greenwich.SR1</spring-cloud.version>
         <docker.image.name>asiasuggester</docker.image.name>
+        <docker.image.version>1.0.1</docker.image.version>
         <docker.account.name>XXXX</docker.account.name>
     </properties>
 
@@ -200,7 +201,7 @@
                 <artifactId>docker-maven-plugin</artifactId>
                 <version>1.2.0</version>
                 <configuration>
-                    <imageName>${docker.account.name}/${docker.image.name}</imageName>
+                    <imageName>${docker.account.name}/${docker.image.name}:${docker.image.version}</imageName>
                     <dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>
                     <skipDocker>false</skipDocker>
                     <resources>

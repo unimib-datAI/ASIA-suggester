@@ -20,6 +20,6 @@ class Datasets {
 
     public List<String> getDatasetsNames() {
         return isEmpty(datasets) ?
-                Collections.emptyList() : datasets.stream().map(Dataset::getDatasetName).collect(Collectors.toList());
+                Collections.emptyList() : datasets.stream().map(Dataset::getName).collect(Collectors.toList());
     }
 }
