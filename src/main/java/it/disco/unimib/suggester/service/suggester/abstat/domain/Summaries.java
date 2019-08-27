@@ -1,6 +1,6 @@
 package it.disco.unimib.suggester.service.suggester.abstat.domain;
 
-import it.disco.unimib.suggester.model.table.Dataset;
+import it.disco.unimib.suggester.model.table.Summary;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,11 +15,11 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 @AllArgsConstructor
 @NoArgsConstructor
 public
-class Datasets {
-    private List<Dataset> datasets;
+class Summaries {
+    private List<Summary> summaries;
 
     public List<String> getDatasetsNames() {
-        return isEmpty(datasets) ?
-                Collections.emptyList() : datasets.stream().map(Dataset::getName).collect(Collectors.toList());
+        return isEmpty(summaries) ?
+                Collections.emptyList() : summaries.stream().map(Summary::getDsName).distinct().collect(Collectors.toList());
     }
 }

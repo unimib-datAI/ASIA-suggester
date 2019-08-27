@@ -7,7 +7,7 @@ import it.disco.unimib.suggester.model.suggestion.Suggestion;
 import it.disco.unimib.suggester.service.suggester.ISuggester;
 import it.disco.unimib.suggester.service.suggester.SuggesterUtils;
 import it.disco.unimib.suggester.service.suggester.abstat.domain.Authentication;
-import it.disco.unimib.suggester.service.suggester.abstat.domain.Datasets;
+import it.disco.unimib.suggester.service.suggester.abstat.domain.Summaries;
 import it.disco.unimib.suggester.service.suggester.abstat.domain.Suggestions;
 import lombok.Getter;
 import lombok.NonNull;
@@ -146,12 +146,13 @@ public class ABSTATSuggester implements ISuggester {
         }
     }
 
-    private Datasets summaries() throws IOException {
-        String url = properties.getAbstat().getFullDatasetsEndpoint();
-        HttpUrl.Builder urlBuilder = requireNonNull(HttpUrl.parse(url)).newBuilder();
+    private Summaries summaries() throws IOException {
+        String url = properties.getAbstat().getFullSummariesEndpoint();
+        HttpUrl.Builder urlBuilder = requireNonNull(HttpUrl.parse(url)).newBuilder()
+                .addQueryParameter("indexed", "true");
         String strDatasets = performAuthenticatedRequest(urlBuilder);
         if (test) System.out.println(SuggesterUtils.prettify(strDatasets));
-        return gson.fromJson(strDatasets, Datasets.class);
+        return gson.fromJson(strDatasets, Summaries.class);
 
     }
 

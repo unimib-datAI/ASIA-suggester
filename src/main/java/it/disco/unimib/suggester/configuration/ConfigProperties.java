@@ -37,7 +37,7 @@ public class ConfigProperties {
         @NotNull
         private String suggestEndpoint;
         @NotNull
-        private String datasetsEndpoint;
+        private String summariesEndpoint;
 
         private String authEndpoint;
         private String authUsername;
@@ -49,8 +49,8 @@ public class ConfigProperties {
             return mainEndpoint + "/" + suggestEndpoint;
         }
 
-        public String getFullDatasetsEndpoint() {
-            return mainEndpoint + "/" + datasetsEndpoint;
+        public String getFullSummariesEndpoint() {
+            return mainEndpoint + "/" + summariesEndpoint;
         }
 
         public String getAuthEndpoint() {
