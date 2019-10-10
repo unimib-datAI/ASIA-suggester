@@ -20,6 +20,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -61,7 +62,18 @@ public class MSTranslator implements ITranslator {
         }
         Type listType = new TypeToken<ArrayList<DetectMessage>>() {
         }.getType();
-        return gson.fromJson(language, listType);
+        List<IDetectedLanguage> ls = null;
+        try { // there might be conversion errors for instance when the credentials are not recognized by the translator
+
+            ls = gson.fromJson(language, listType);
+        } catch (Exception e) {
+            e.printStackTrace();
+            ls = textList.stream()
+                    .map(x -> new DetectMessage("en", 1.0, Boolean.TRUE, Boolean.FALSE, null))
+                    .collect(Collectors.toList());
+        }
+
+        return ls;
     }
 
     @Override
