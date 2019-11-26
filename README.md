@@ -48,3 +48,10 @@ A precompiled Docker image of ASIA-MAS can be found at:
 ````
 https://hub.docker.com/r/miciav/asiasuggester
 ````
+
+A list of third-party libraries together with their licenses is reported in [THIRD-PARTY.txt](https://github.com/UNIMIBInside/ASIA-suggester/blob/master/src/license/THIRD-PARTY.txt)
+
+To update the list of third party license file run:
+```
+$ mvn license:add-third-party  
+```
